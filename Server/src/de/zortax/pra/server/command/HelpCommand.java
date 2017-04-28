@@ -27,7 +27,7 @@ import java.util.logging.Level;
 public class HelpCommand {
 
     @PraCommand(name = "help", usage = "help [command]", description = "Shows help")
-    public static void onCommand(String[] args) {
+    public static void onCommand(CommandSender sender, String[] args) {
         if (args == null || args.length == 0) {
 
             ServerManager.commandManager.getCommands().values().forEach(m -> {

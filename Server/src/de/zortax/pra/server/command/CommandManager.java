@@ -101,9 +101,10 @@ public class CommandManager {
                         } else {
                             sender.sendMessage(Level.WARNING, "You do not have permissions to perform this command!");
                         }
-                    } else if (cmdMethod.getParameterCount() == 0) {
+                    } else if (cmdMethod.getParameterCount() == 1)
+                        commands.get(cmd[0]).invoke(null, sender);
+                    else if (cmdMethod.getParameterCount() == 0)
                         commands.get(cmd[0]).invoke(null);
-                    }
                 } else {
                     sender.sendMessage(Level.WARNING, "Command \"" + cmd[0] + "\" not found!");
                 }
