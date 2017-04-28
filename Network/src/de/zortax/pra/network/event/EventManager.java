@@ -39,7 +39,7 @@ public class EventManager {
         try {
             for (Method method : listener.getClass().getDeclaredMethods()) {
                 if (method.isAnnotationPresent(EventHandler.class)) {
-                    if (method.getParameterCount() == 1 && method.getParameters()[0].getType().getSuperclass().equals(Event.class)) {
+                    if (method.getParameterCount() == 1 && Event.class.isAssignableFrom(method.getParameters()[0].getType())) {
                         EventHandler annotation = method.getAnnotation(EventHandler.class);
                         ConcurrentHashMap<EventPrio, ArrayList<Listener>> listeners = eventListener.getOrDefault(method.getParameters()[0].getType().getName(), new ConcurrentHashMap<>());
                         ArrayList<Listener> methods = listeners.getOrDefault(annotation.prio(), new ArrayList<>());
@@ -74,7 +74,11 @@ public class EventManager {
             listeners.get(EventPrio.LOWEST).forEach(listener -> listener.invoke(event));
     }
 
-    private class Listener {
+    public ConcurrentHashMap<String, ConcurrentHashMap<EventPrio, ArrayList<Listener>>> getAllListeners() {
+        return eventListener;
+    }
+
+    public static class Listener {
 
         private Object owner;
         private Method listener;
