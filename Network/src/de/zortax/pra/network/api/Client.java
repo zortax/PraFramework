@@ -33,5 +33,8 @@ public interface Client {
     Socket getSocket();
     InetAddress getInetAddress();
     int getProtocolVersion();
+    default String getClientName() {
+        return "";
+    }
 
 }

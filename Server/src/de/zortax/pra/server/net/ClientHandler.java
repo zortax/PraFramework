@@ -136,7 +136,7 @@ public final class ClientHandler extends Thread implements Client {
         }
     }
 
-    public String getServerName() {
+    public String getClientName() {
         return serverName;
     }
 
