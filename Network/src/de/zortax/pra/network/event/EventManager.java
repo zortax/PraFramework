@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class EventManager {
 
-    private ConcurrentHashMap<Class<? extends Event>, ConcurrentHashMap<EventPrio, ArrayList<Listener>>> eventListener;
+    private ConcurrentHashMap<String, ConcurrentHashMap<EventPrio, ArrayList<Listener>>> eventListener;
 
     public EventManager() {
         this.eventListener = new ConcurrentHashMap<>();
@@ -41,12 +41,12 @@ public class EventManager {
                 if (method.isAnnotationPresent(EventHandler.class)) {
                     if (method.getParameterCount() == 1 && method.getParameters()[0].getType().getSuperclass().equals(Event.class)) {
                         EventHandler annotation = method.getAnnotation(EventHandler.class);
-                        ConcurrentHashMap<EventPrio, ArrayList<Listener>> listeners = eventListener.getOrDefault(method.getParameters()[0].getType(), new ConcurrentHashMap<>());
+                        ConcurrentHashMap<EventPrio, ArrayList<Listener>> listeners = eventListener.getOrDefault(method.getParameters()[0].getType().getName(), new ConcurrentHashMap<>());
                         ArrayList<Listener> methods = listeners.getOrDefault(annotation.prio(), new ArrayList<>());
                         method.setAccessible(true);
                         methods.add(new Listener(listener, method));
                         listeners.put(annotation.prio(), methods);
-                        eventListener.put((Class<? extends Event>) method.getParameters()[0].getType(), listeners);
+                        eventListener.put((method.getParameters()[0].getType().getName()), listeners);
                     }
                 }
             }
@@ -56,7 +56,7 @@ public class EventManager {
     }
 
     public void callEvent(Event event) {
-        ConcurrentHashMap<EventPrio, ArrayList<Listener>> listeners = eventListener.getOrDefault(event.getClass(), new ConcurrentHashMap<>());
+        ConcurrentHashMap<EventPrio, ArrayList<Listener>> listeners = eventListener.getOrDefault(event.getClass().getName(), new ConcurrentHashMap<>());
 
         if (listeners.containsKey(EventPrio.HIGHEST))
             listeners.get(EventPrio.HIGHEST).forEach(listener -> listener.invoke(event));

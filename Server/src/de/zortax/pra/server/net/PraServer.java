@@ -85,7 +85,7 @@ public class PraServer {
 
     public void addPacketHandler(PacketHandler handler) {
         for (Class<? extends PraPacket> type : handler.getPacketTypes()) {
-            if (packetHandlers.contains(type)) {
+            if (packetHandlers.containsKey(type)) {
                 packetHandlers.get(type).add(handler);
             } else {
                 ArrayList<PacketHandler> handlers = new ArrayList<>();
