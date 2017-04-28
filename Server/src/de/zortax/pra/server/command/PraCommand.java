@@ -32,6 +32,7 @@ public @interface PraCommand {
     String name();
     String usage();
     String description() default "No description";
+    String permission() default "none";
     int minArgs() default -1;
     int maxArgs() default -1;
     boolean async() default false;

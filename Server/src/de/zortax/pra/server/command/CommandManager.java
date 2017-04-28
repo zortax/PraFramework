@@ -75,45 +75,52 @@ public class CommandManager {
         return inputThreadObject;
     }
 
+    public void execute(CommandSender sender, String command) {
+        try {
+            String[] cmd = command.split(" ");
+            if (cmd.length > 0) {
+                if (commands.containsKey(cmd[0])) {
+                    ServerManager.logger.log(Level.INFO, sender.getName() + " issued server command " + cmd[0]);
+                    Method cmdMethod = commands.get(cmd[0]);
+                    if (cmdMethod.getParameterCount() == 2 && cmdMethod.getParameterTypes()[0].equals(CommandSender.class) && cmdMethod.getParameterTypes()[1].equals(String[].class)) {
+                        String[] args = new String[cmd.length - 1];
+                        System.arraycopy(cmd, 1, args, 0, args.length);
+                        PraCommand annotation = cmdMethod.getAnnotation(PraCommand.class);
+                        if (sender.hasPermission(annotation.permission())) {
+                            if (annotation.minArgs() > 0 && args.length < annotation.minArgs()) {
+                                sender.sendMessage(Level.WARNING, "Error: Not enough arguments!");
+                                sender.sendMessage(Level.WARNING, "Usage: " + annotation.usage());
+                                return;
+                            }
+                            if (annotation.maxArgs() > -1 && args.length > annotation.maxArgs()) {
+                                sender.sendMessage(Level.WARNING, "Error: Too many arguments!");
+                                sender.sendMessage(Level.WARNING, "Usage: " + annotation.usage());
+                                return;
+                            }
+                            commands.get(cmd[0]).invoke(null, sender, args);
+                        } else {
+                            sender.sendMessage(Level.WARNING, "You do not have permissions to perform this command!");
+                        }
+                    } else if (cmdMethod.getParameterCount() == 0) {
+                        commands.get(cmd[0]).invoke(null);
+                    }
+                } else {
+                    sender.sendMessage(Level.WARNING, "Command \"" + cmd[0] + "\" not found!");
+                }
+            }
+        } catch (Exception e) {
+            ExceptionHandler.addException(e);
+        }
+    }
+
     private class InputThread implements Runnable {
 
         @Override
         public void run() {
             ServerManager.logger.log(Level.INFO, "Input listener started...");
             try {
-                while (true) {
-                    try {
-                        String[] cmd = scanner.nextLine().split(" ");
-                        if (cmd.length > 0) {
-                            if (commands.containsKey(cmd[0])) {
-                                ServerManager.logger.log(Level.INFO, "Console issued server command " + cmd[0]);
-                                Method cmdMethod = commands.get(cmd[0]);
-                                if (cmdMethod.getParameterCount() == 1 && cmdMethod.getParameterTypes()[0].equals(String[].class)) {
-                                    String[] args = new String[cmd.length - 1];
-                                    System.arraycopy(cmd, 1, args, 0, args.length);
-                                    PraCommand annotation = cmdMethod.getAnnotation(PraCommand.class);
-                                    if (annotation.minArgs() > 0 && args.length < annotation.minArgs()) {
-                                        ServerManager.logger.log(Level.WARNING, "Error: Not enough arguments!");
-                                        ServerManager.logger.log(Level.WARNING, "Usage: " + annotation.usage());
-                                        continue;
-                                    }
-                                    if (annotation.maxArgs() > -1 && args.length > annotation.maxArgs()) {
-                                        ServerManager.logger.log(Level.WARNING, "Error: Too many arguments!");
-                                        ServerManager.logger.log(Level.WARNING, "Usage: " + annotation.usage());
-                                        continue;
-                                    }
-                                    commands.get(cmd[0]).invoke(null, (Object) args);
-                                } else if (cmdMethod.getParameterCount() == 0) {
-                                    commands.get(cmd[0]).invoke(null);
-                                }
-                            } else {
-                                ServerManager.logger.log(Level.WARNING, "Command \"" + cmd[0] + "\" not found!");
-                            }
-                        }
-                    } catch (Exception e) {
-                        ExceptionHandler.addException(e);
-                    }
-                }
+                while (true)
+                    execute(ConsoleSender.instance, scanner.nextLine());
             } catch (Exception e) {
                 ExceptionHandler.addException(e);
             }

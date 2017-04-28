@@ -111,6 +111,10 @@ public class PraClient {
         return requestManager;
     }
 
+    public Socket getSocket() {
+        return socket;
+    }
+
     /*
      * Threadsafe! (Call it async!)
      */
