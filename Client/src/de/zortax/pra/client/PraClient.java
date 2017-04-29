@@ -21,25 +21,27 @@
 package de.zortax.pra.client;//  Created by Leonard on 03.03.2017.
 
 import de.zortax.pra.network.PraPacket;
+import de.zortax.pra.network.event.*;
 import de.zortax.pra.network.handler.PacketHandler;
 import de.zortax.pra.network.packets.HandshakePacket;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PraClient {
 
     private Socket socket;
-    private PrintWriter writer;
+    private DataOutputStream dataOutputStream;
     private ConcurrentHashMap<Class<? extends PraPacket>, ArrayList<PacketHandler>> packetHandlers;
     private ArrayList<PacketHandler> defaultHandlers;
     private Thread inputThread;
     private RequestManager requestManager;
+    private EventManager eventManager;
 
     public static final int PROTOCOL_VERSION = 1;
 
@@ -48,9 +50,10 @@ public class PraClient {
     public PraClient(String serverAddress, int port, PacketHandler defaultPacketHandler, String clientName, String clientVersion, String protocolVersion) {
         try {
             this.socket = new Socket(serverAddress, port);
-            this.writer = new PrintWriter(socket.getOutputStream());
+            this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
             this.packetHandlers = new ConcurrentHashMap<>();
             this.defaultHandlers = new ArrayList<>();
+            this.eventManager = new EventManager();
             this.inputThread = new Thread(new InputThread());
             if (defaultPacketHandler != null)
                 this.defaultHandlers.add(defaultPacketHandler);
@@ -67,7 +70,7 @@ public class PraClient {
         try {
             synchronized (lock) {
                 inputThread.interrupt();
-                writer.close();
+                dataOutputStream.close();
                 socket.close();
             }
         } catch (IOException e) {
@@ -120,18 +123,32 @@ public class PraClient {
      */
     public void sendPacket(final PraPacket packet) {
         synchronized (lock) {
-            writer.println(packet.toString());
-            writer.flush();
+            PacketSendEvent event = new PacketSendEvent(packet, null);
+            eventManager.callEvent(event);
+            if (!event.isCancelled()) {
+                try {
+                    dataOutputStream.writeInt(event.getPacket().getBytes().length);
+                    dataOutputStream.flush();
+                    dataOutputStream.write(event.getPacket().getBytes());
+                    dataOutputStream.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
+    }
+
+    public EventManager getEventManager() {
+        return eventManager;
     }
 
     private class InputThread implements Runnable {
 
-        private Scanner scanner;
+        private DataInputStream dataInputStream;
 
         public InputThread() {
             try {
-                scanner = new Scanner(socket.getInputStream());
+                dataInputStream = new DataInputStream(socket.getInputStream());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -142,13 +159,24 @@ public class PraClient {
             try {
                 while (true) {
                     try {
-                        String rawPacket = scanner.nextLine();
-                        final PraPacket packet = PraPacket.fromJson(rawPacket);
-                        try {
-                            getHandlersFor(packet.getClass()).forEach(handler -> handler.handlePacket(packet));
-                        } catch (Exception e) {
-                            // PacketHandler exception
-                            e.printStackTrace();
+                        int size = dataInputStream.readInt();
+                        byte[] bytes = new byte[size];
+                        for (int i = 0; i < size; i++) {
+                            bytes[i] = dataInputStream.readByte();
+                        }
+                        PacketPreProcessingEvent preProcessingEvent = new PacketPreProcessingEvent(bytes, null);
+                        eventManager.callEvent(preProcessingEvent);
+                        final PraPacket packet = PraPacket.fromBytes(preProcessingEvent.getRawData());
+                        UnhandledPacketEvent event = new UnhandledPacketEvent(packet, null);
+                        eventManager.callEvent(event);
+                        if (!event.isCancelled()) {
+                            try {
+                                getHandlersFor(packet.getClass()).forEach(handler -> handler.handlePacket(packet));
+                                eventManager.callEvent(new HandledPacketEvent(packet, null));
+                            } catch (Exception e) {
+                                // PacketHandler exception
+                                e.printStackTrace();
+                            }
                         }
 
                     } catch (Exception e) {

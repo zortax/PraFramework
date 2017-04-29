@@ -18,12 +18,10 @@
 
  */
 
-package de.zortax.pra.server.events;//  Created by Leonard on 03.03.2017.
+package de.zortax.pra.network.event;//  Created by Leonard on 03.03.2017.
 
 import de.zortax.pra.network.PraPacket;
 import de.zortax.pra.network.api.Client;
-import de.zortax.pra.network.event.Cancellable;
-import de.zortax.pra.network.event.Event;
 
 public class UnhandledPacketEvent implements Event, Cancellable {
 

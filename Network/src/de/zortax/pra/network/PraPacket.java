@@ -26,6 +26,8 @@ import java.io.Serializable;
 
 public abstract class PraPacket implements Serializable {
 
+    public static final String END_SEQUENCE = "[PACKET-END]";
+
     private static final transient Gson gson = new Gson();
     private final Long timestamp = System.currentTimeMillis();
     private boolean requestFlag = false;
@@ -33,8 +35,16 @@ public abstract class PraPacket implements Serializable {
     private String source = "";
 
     @Override
-    public final String toString() {
+    public String toString() {
         return "<HEADER>" + this.getClass().getName() + "</HEADER>:" + gson.toJson(this);
+    }
+
+    public byte[] getBytes() {
+        return toString().getBytes();
+    }
+
+    public static PraPacket fromBytes(byte[] bytes) throws Exception {
+        return fromJson(new String(bytes));
     }
 
     public static PraPacket fromJson(String rawPacket) throws Exception  {
