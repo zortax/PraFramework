@@ -85,7 +85,12 @@ public final class ClientHandler extends Thread implements Client {
                 dataOutputStream.flush();
                 dataOutputStream.write(event.getPacket().getBytes());
                 dataOutputStream.flush();
-            } catch (IOException e) {
+            } catch (Exception e) {
+                if (e.getMessage().toLowerCase().contains("broken pipe")) {
+                    ServerManager.logger.log(Level.INFO, client.getInetAddress().toString() + " (" + serverName + ") closed connection!");
+                    closeConnection();
+                    return;
+                }
                 e.printStackTrace();
             }
         }
@@ -151,6 +156,9 @@ public final class ClientHandler extends Thread implements Client {
             while (true) {
 
                 int s = dataInputStream.readInt();
+
+                if (s < 1)
+                    throw new Exception("Received illegal packet size: " + s);
 
                 ServerManager.debug("Received packet size: " + s, 9);
                 byte[] data = new byte[s];
