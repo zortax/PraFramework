@@ -34,9 +34,9 @@ public class ServerManager {
     public static CommandManager commandManager;
     public static EventManager eventManager;
     public static PluginLoader pluginLoader;
-    public static boolean debug = true;
+    public static boolean debug = false;
     public static int debugLevel = 10;
-    public static boolean debugWithLogger = false;
+    public static boolean debugWithLogger = true;
 
     public ServerManager(String bindingIP, int port) {
         logger = Logger.getLogger("PraServer");
@@ -96,11 +96,13 @@ public class ServerManager {
     }
 
     public static void debug(String message, int level) {
-        if (debugLevel >= level) {
-            if (debugWithLogger)
-                logger.info(message);
-            else
-                System.out.println(message);
+        if (debug) {
+            if (debugLevel >= level) {
+                if (debugWithLogger)
+                    logger.info(message);
+                else
+                    System.out.println(message);
+            }
         }
     }
 
