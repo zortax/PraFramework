@@ -26,8 +26,6 @@ import java.io.Serializable;
 
 public abstract class PraPacket implements Serializable {
 
-    public static final String END_SEQUENCE = "[PACKET-END]";
-
     private static final transient Gson gson = new Gson();
     private final Long timestamp = System.currentTimeMillis();
     private boolean requestFlag = false;
