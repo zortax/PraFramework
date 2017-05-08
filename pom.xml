@@ -7,6 +7,7 @@
     <groupId>de.zortax.pra</groupId>
     <artifactId>PraFramework</artifactId>
     <version>1.0-pre-1</version>
+    <packaging>pom</packaging>
 
     <modules>
         <module>Client</module>
