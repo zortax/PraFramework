@@ -1,2 +1,17 @@
 language: java
 jdk: oraclejdk8
+
+before_deploy:
+  - git config --global user.email "$EMAIL"
+  - git config --global user.name "$USERNAME"
+  - export GIT_TAG=$TRAVIS_BRANCH-b$TRAVIS_BUILD_NUMBER
+  - git tag $GIT_TAG -a -m "Build $TRAVIS_BUILD_NUMBER"
+  - git push -q https://$API_KEY@github.com/Zortax/PraFramework --tags
+
+deploy:
+  provider: releases
+  api_key: $API_KEY
+  file: PraFramework.jar
+  skip_cleanup: true
+  on:
+    tags: true
