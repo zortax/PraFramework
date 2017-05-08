@@ -23,12 +23,11 @@ package de.zortax.pra.network.config;//  Created by Leonard on 03.03.2017.
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import de.zortax.pra.network.error.ExceptionHandler;
-import org.apache.commons.io.IOUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.Scanner;
 
 public abstract class Config {
 
@@ -62,8 +61,7 @@ public abstract class Config {
     public static <T extends Config> T load(File file, Class<T> config) {
         try {
             if (file.exists()) {
-                FileInputStream inputStream = new FileInputStream(file);
-                String json = IOUtils.toString(inputStream);
+                String json = (new Scanner(file)).useDelimiter("\\Z").next();
                 T cfg = gson.fromJson(json, config);
                 cfg.setName(file.getName());
                 return cfg;
@@ -91,7 +89,7 @@ public abstract class Config {
 
     public static <T extends Config> T load(InputStream inputStream, Class<T> config) {
         try {
-            String json = IOUtils.toString(inputStream, "UTF-8");
+            String json = (new Scanner(inputStream)).useDelimiter("\\Z").next();
             T cfg = gson.fromJson(json, config);
             cfg.setName("unknown stream");
             return cfg;
