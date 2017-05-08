@@ -34,7 +34,9 @@ import de.zortax.pra.server.events.ClientDisconnectedEvent;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.NoSuchElementException;
@@ -74,7 +76,7 @@ public final class ClientHandler extends Thread implements Client {
         }
     }
 
-    public void sendPacket(PraPacket packet) {
+    public boolean sendPacket(PraPacket packet) {
         if (!connected)
             throw new IllegalStateException("Client is not connected!");
         PacketSendEvent event = new PacketSendEvent(packet, this);
@@ -85,15 +87,15 @@ public final class ClientHandler extends Thread implements Client {
                 dataOutputStream.flush();
                 dataOutputStream.write(event.getPacket().getBytes());
                 dataOutputStream.flush();
+                return true;
             } catch (Exception e) {
-                if (e.getMessage().toLowerCase().contains("broken pipe")) {
-                    ServerManager.logger.log(Level.INFO, client.getInetAddress().toString() + " (" + serverName + ") closed connection!");
-                    closeConnection();
-                    return;
-                }
-                e.printStackTrace();
+                closeConnection();
+                ServerManager.logger.log(Level.WARNING, "Connection to " + client.getInetAddress().toString() + " (" + serverName + ") was interrupted: " + e.getMessage());
+                ExceptionHandler.addException(e);
+                return false;
             }
         }
+        return false;
     }
 
     @Override
@@ -189,13 +191,17 @@ public final class ClientHandler extends Thread implements Client {
             }
 
 
-        } catch (NoSuchElementException e) {
+        } catch (ConnectException e) {
+            closeConnection();
+            ServerManager.logger.log(Level.WARNING, "Connection to " + client.getInetAddress().toString() + " (" + serverName + ") was interrupted: " + e.getMessage());
+            ExceptionHandler.addException(e);
+        } catch (EOFException e) {
+            closeConnection();
             ServerManager.logger.log(Level.INFO, client.getInetAddress().toString() + " (" + serverName + ") closed connection!");
+        } catch (Exception e) {
             closeConnection();
-        } catch (Exception e1) {
-            ServerManager.logger.log(Level.WARNING, "Connection to " + client.getInetAddress().toString() + " (" + serverName + ") was interrupted: " + e1.getMessage());
-            closeConnection();
-            ExceptionHandler.addException(e1);
+            ServerManager.logger.log(Level.WARNING, "Connection to " + client.getInetAddress().toString() + " (" + serverName + ") was interrupted: " + e.getMessage());
+            ExceptionHandler.addException(e);
         }
     }
 

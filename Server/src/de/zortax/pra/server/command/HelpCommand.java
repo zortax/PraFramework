@@ -34,10 +34,10 @@ public class HelpCommand {
 
                 PraCommand annotation = m.getAnnotation(PraCommand.class);
 
-                ServerManager.logger.log(Level.INFO, " ");
-                ServerManager.logger.log(Level.INFO, annotation.name() + " | " + annotation.usage());
-                ServerManager.logger.log(Level.INFO, "    " + annotation.description());
-                ServerManager.logger.log(Level.INFO, " ");
+                sender.sendMessage(" ");
+                sender.sendMessage(annotation.name() + " | " + annotation.usage());
+                sender.sendMessage("    " + annotation.description());
+                sender.sendMessage(" ");
 
             });
 
@@ -45,14 +45,14 @@ public class HelpCommand {
 
             PraCommand annotation = ServerManager.commandManager.getCommands().get(args[0]).getAnnotation(PraCommand.class);
 
-            ServerManager.logger.log(Level.INFO, " ");
-            ServerManager.logger.log(Level.INFO, annotation.name() + " | " + annotation.usage());
-            ServerManager.logger.log(Level.INFO, "    " + annotation.description());
-            ServerManager.logger.log(Level.INFO, " ");
+            sender.sendMessage(" ");
+            sender.sendMessage(annotation.name() + " | " + annotation.usage());
+            sender.sendMessage("    " + annotation.description());
+            sender.sendMessage(" ");
 
         } else {
 
-            ServerManager.logger.log(Level.WARNING, "There is no command with the name \"" + args[0] + "\"!");
+            sender.sendMessage("There is no command with the name \"" + args[0] + "\"!");
 
         }
     }

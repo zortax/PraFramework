@@ -29,7 +29,7 @@ public interface Client {
 
     void start();
     void closeConnection();
-    void sendPacket(PraPacket packet);
+    boolean sendPacket(PraPacket packet);
     Socket getSocket();
     InetAddress getInetAddress();
     int getProtocolVersion();
