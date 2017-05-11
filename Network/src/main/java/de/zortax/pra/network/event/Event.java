@@ -20,5 +20,8 @@
 
 package de.zortax.pra.network.event;//  Created by Leonard on 03.03.2017.
 
+/**
+ * Basic event interface
+ */
 public interface Event {
 }

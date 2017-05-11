@@ -3,6 +3,9 @@ package de.zortax.pra.network.event;//  Created by Leo on 29.04.2017.
 import de.zortax.pra.network.PraPacket;
 import de.zortax.pra.network.api.Client;
 
+/**
+ * Gets called when a packet is being sent
+ */
 public class PacketSendEvent implements Event, Cancellable {
 
     private boolean cancelled;

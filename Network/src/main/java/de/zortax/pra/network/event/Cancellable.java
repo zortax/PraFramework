@@ -20,6 +20,9 @@
 
 package de.zortax.pra.network.event;//  Created by Leonard on 03.03.2017.
 
+/**
+ * should be implemented by all events that are cancellable
+ */
 public interface Cancellable {
 
     void setCancelled(boolean cancelled);

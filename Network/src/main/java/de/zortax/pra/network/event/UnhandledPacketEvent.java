@@ -23,6 +23,9 @@ package de.zortax.pra.network.event;//  Created by Leonard on 03.03.2017.
 import de.zortax.pra.network.PraPacket;
 import de.zortax.pra.network.api.Client;
 
+/**
+ * Gets called before invoking the packet handlers when a packet was received
+ */
 public class UnhandledPacketEvent implements Event, Cancellable {
 
     private PraPacket packet;
@@ -39,6 +42,10 @@ public class UnhandledPacketEvent implements Event, Cancellable {
         return packet;
     }
 
+    /**
+     * Only use this serverside
+     * @return the client that sent this packet
+     */
     public Client getSourceClient() {
         return sourceClient;
     }

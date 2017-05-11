@@ -36,6 +36,9 @@ public class DataPacket extends PraPacket {
         this.data = new HashMap<>();
     }
 
+    /**
+     * @return mapped data
+     */
     public HashMap<String, String> getData() {
         return data;
     }

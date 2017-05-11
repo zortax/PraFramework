@@ -21,5 +21,8 @@
 package de.zortax.pra.network.event;//  Created by Leonard on 03.03.2017.
 
 public enum EventPrio {
+    /**
+     * the lower the event priority, the earlier the listener is going to be invoked
+     */
     LOWEST, LOW, NORMAL, HIGH, HIGHEST
 }

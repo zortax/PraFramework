@@ -2,6 +2,9 @@ package de.zortax.pra.network.event;//  Created by Leo on 29.04.2017.
 
 import de.zortax.pra.network.api.Client;
 
+/**
+ * Gets called before raw packet data is going to be deserialized automatically
+ */
 public class PacketPreProcessingEvent implements Event {
 
     private byte[] rawData;

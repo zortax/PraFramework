@@ -31,12 +31,24 @@ public abstract class PacketHandler {
         this.packetTypes = packetTypes;
     }
 
+    /**
+     * @return the packet types this handler is listening on
+     */
     public final Class<? extends PraPacket>[] getPacketTypes() {
         return packetTypes;
     }
 
+    /**
+     * Gets called when the server receives a packet from a client (override this method serverside)
+     * @param client the client that sent this packet
+     * @param packet the packet that the client sent (use <code>instanceof</code> before casting to a specific packet type if this handler is listening on multiple packet types)
+     */
     public void handlePacket(Client client, PraPacket packet){}
 
+    /**
+     * Gets called when the client receives a packet from the server (override this method clientside)
+     * @param packet the packet that the server sent (use <code>instanceof</code> before casting to a specific packet type if this handler is listening on multiple packet types)
+     */
     public void handlePacket(PraPacket packet){}
 
 }

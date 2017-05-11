@@ -34,6 +34,10 @@ public class EventManager {
         this.eventListener = new ConcurrentHashMap<>();
     }
 
+    /**
+     * Registers the non-static listener methods of a given object
+     * @param listener the object
+     */
     public void addListener(Object listener) {
 
         try {
@@ -55,25 +59,32 @@ public class EventManager {
         }
     }
 
+    /**
+     * Invokes all event listeners for the type of this given event instance with the given event instance
+     * @param event the event instance
+     */
     public void callEvent(Event event) {
         ConcurrentHashMap<EventPrio, ArrayList<Listener>> listeners = eventListener.getOrDefault(event.getClass().getName(), new ConcurrentHashMap<>());
 
-        if (listeners.containsKey(EventPrio.HIGHEST))
-            listeners.get(EventPrio.HIGHEST).forEach(listener -> listener.invoke(event));
-
-        if (listeners.containsKey(EventPrio.HIGH))
-            listeners.get(EventPrio.HIGHEST).forEach(listener -> listener.invoke(event));
-
-        if (listeners.containsKey(EventPrio.NORMAL))
-            listeners.get(EventPrio.NORMAL).forEach(listener -> listener.invoke(event));
+        if (listeners.containsKey(EventPrio.LOWEST))
+            listeners.get(EventPrio.LOWEST).forEach(listener -> listener.invoke(event));
 
         if (listeners.containsKey(EventPrio.LOW))
             listeners.get(EventPrio.LOW).forEach(listener -> listener.invoke(event));
 
-        if (listeners.containsKey(EventPrio.LOWEST))
-            listeners.get(EventPrio.LOWEST).forEach(listener -> listener.invoke(event));
+        if (listeners.containsKey(EventPrio.NORMAL))
+            listeners.get(EventPrio.NORMAL).forEach(listener -> listener.invoke(event));
+
+        if (listeners.containsKey(EventPrio.HIGH))
+            listeners.get(EventPrio.HIGHEST).forEach(listener -> listener.invoke(event));
+
+        if (listeners.containsKey(EventPrio.HIGHEST))
+            listeners.get(EventPrio.HIGHEST).forEach(listener -> listener.invoke(event));
     }
 
+    /**
+     * @return all event listeners mapped to their priority mapped to the event type they are listening on
+     */
     public ConcurrentHashMap<String, ConcurrentHashMap<EventPrio, ArrayList<Listener>>> getAllListeners() {
         return eventListener;
     }

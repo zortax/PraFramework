@@ -37,14 +37,29 @@ public abstract class PraPacket implements Serializable {
         return "<HEADER>" + this.getClass().getName() + "</HEADER>:" + gson.toJson(this);
     }
 
+
+    /**
+     * @return the data that actually being send
+     */
     public byte[] getBytes() {
         return toString().getBytes();
     }
 
+    /**
+     * @param bytes raw packet data
+     * @return the PraPacket instance that was created from the bytes array
+     * @throws Exception what could actually go wrong?
+     */
     public static PraPacket fromBytes(byte[] bytes) throws Exception {
         return fromJson(new String(bytes));
     }
 
+    /**
+     * Default Packet deserialization
+     * @param rawPacket raw packet (header + json)
+     * @return PraPacket instance created
+     * @throws Exception That's probably gonna work...
+     */
     public static PraPacket fromJson(String rawPacket) throws Exception  {
         if (!rawPacket.contains("<HEADER>") || !rawPacket.contains("</HEADER>:")) {
             throw new IllegalArgumentException("Wrong Packet format, doesn't contain header!");
@@ -65,6 +80,10 @@ public abstract class PraPacket implements Serializable {
 
     }
 
+    /**
+     * @param rawPacket raw packet (header + json)
+     * @return the actual packet json without the header
+     */
     public static String getPacketSerial(String rawPacket) {
         if (!rawPacket.contains("<HEADER>") || !rawPacket.contains("</HEADER>:")) {
             return rawPacket;
@@ -73,30 +92,54 @@ public abstract class PraPacket implements Serializable {
         }
     }
 
+    /** Creates an instance of the packet class with json
+     * @param serial the JSON the instance is created with
+     * @param clazz the packet class
+     * @param <T> type of the packet
+     * @return created instance of clazz
+     */
     public static <T extends PraPacket> T getPacket(String serial, Class<T> clazz) {
         return gson.fromJson(serial, clazz);
     }
 
+    /**
+     * @return the time the packet was created on
+     */
     public Long getTimestamp(){
         return timestamp;
     }
 
+    /**
+     * @return if this packet is a request packet or it's answer
+     */
     public final boolean getRequestFlag() {
         return requestFlag;
     }
 
+    /**
+     * @param flag if this packet is a request packet or the answer to a request packet
+     */
     public final void setRequestFlag(boolean flag) {
         this.requestFlag = flag;
     }
 
+    /**
+     * @return the ID of this request/answer
+     */
     public final String getRequestID() {
         return requestID;
     }
 
+    /**
+     * @param requestID the ID of this request/answer
+     */
     public final void setRequestID(String requestID) {
         this.requestID = requestID;
     }
 
+    /**
+     * @return the original source of this packet
+     */
     public String getSource() {
         return source;
     }
