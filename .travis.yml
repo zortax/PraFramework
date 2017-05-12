@@ -3,6 +3,7 @@ jdk: oraclejdk8
 script: mvn clean package
 deploy:
   provider: releases
+  prerelease: true
   api_key: $API_KEY
   file: ./Server/target/PraFramework-bin.jar
   skip_cleanup: true
