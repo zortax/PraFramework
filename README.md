@@ -6,7 +6,7 @@ Simple TCP-Networking framework written in Java
 **Download JAR-File:** [Releases Page](https://github.com/Zortax/PraFramework/releases "Releases")
 
 ## Features
-* TCP-Networking (Packets, Requestsystem)
+* [TCP-Networking](https://github.com/Zortax/PraFramework/wiki/Networking "Tutorial") (Packets, Requestsystem)
 * Eventsystem (Server- and Clientside)
 * Commandsystem (Serverside, optional)
 * Pluginsystem (Serverside, optional)
