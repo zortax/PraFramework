@@ -47,6 +47,7 @@ public class PraClient {
 
     private static final Object lock = new Object();
 
+
     public PraClient(String serverAddress, int port, PacketHandler defaultPacketHandler, String clientName, String clientVersion, String protocolVersion) {
         try {
             this.socket = new Socket(serverAddress, port);
@@ -64,6 +65,14 @@ public class PraClient {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public PraClient(String serverAddress, int port) {
+        this(serverAddress, port, null, "pra-client", "unknown", "pra_" + PROTOCOL_VERSION);
+    }
+
+    public PraClient(String serverAddress, int port, String clientName, String clientVersion) {
+        this(serverAddress, port, null, clientName, clientVersion, "pra_" + PROTOCOL_VERSION);
     }
 
     public void close() {

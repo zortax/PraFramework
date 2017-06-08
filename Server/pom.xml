@@ -7,7 +7,7 @@
         <dependency>
             <groupId>de.zortax.pra</groupId>
             <artifactId>Network</artifactId>
-            <version>1.0-pre-1</version>
+            <version>1.0-pre-3</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -18,16 +18,16 @@
         <dependency>
             <groupId>de.zortax.pra</groupId>
             <artifactId>Client</artifactId>
-            <version>1.0-pre-1</version>
+            <version>1.0-pre-3</version>
         </dependency>
     </dependencies>
     <parent>
         <groupId>de.zortax.pra</groupId>
         <artifactId>PraFramework</artifactId>
-        <version>1.0-pre-1</version>
+        <version>1.0-pre-3</version>
     </parent>
     <artifactId>Server</artifactId>
-    <version>1.0-pre-1</version>
+    <version>1.0-pre-3</version>
 
     <build>
         <finalName>PraFramework</finalName>
