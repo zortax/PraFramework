@@ -24,8 +24,16 @@ import de.zortax.pra.network.api.Client;
 
 import java.net.Socket;
 
+/**
+ * Interface for custom socket to client instance.
+ * Create a custom client acceptor if you want to user a custom Client implementation
+ */
 public interface ClientAcceptor {
 
+    /**
+     * @param socket the Socket instance of the client that just connected
+     * @return the Client instance
+     */
     Client accept(Socket socket);
 
 }

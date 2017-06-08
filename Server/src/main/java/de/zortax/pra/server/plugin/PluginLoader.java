@@ -45,6 +45,9 @@ public class PluginLoader {
     private Method addURLMethod = null;
     private URLClassLoader classLoader = null;
 
+    /**
+     * Creates a new PluginLoader
+     */
     public PluginLoader() {
         this.plugins = new ArrayList<>();
         try {
@@ -56,6 +59,10 @@ public class PluginLoader {
         }
     }
 
+    /**
+     * Tries to load all plugins
+     * @param pluginPath The path to the folder the plugins are in
+     */
     public void loadPlugins(String pluginPath) {
 
         ServerManager.logger.log(Level.INFO, "Loading plugins...");
@@ -116,6 +123,9 @@ public class PluginLoader {
         addURLMethod.invoke(classLoader, url);
     }
 
+    /**
+     * Enabled all loaded plugins (calls their oEnable method)
+     */
     public void enablePlugins() {
         plugins.forEach(plugin -> {
             plugin.onEnable();
@@ -123,6 +133,9 @@ public class PluginLoader {
         });
     }
 
+    /**
+     * Disables all loaded plugins (calls their onDisable method)
+     */
     public void disablePlugins() {
         plugins.forEach(plugin -> {
             plugin.onDisable();
@@ -130,6 +143,10 @@ public class PluginLoader {
         });
     }
 
+    /**
+     * Gets all loaded plugins
+     * @return a list of all plugins currently loaded
+     */
     public ArrayList<PraPlugin> getPlugins() {
         return plugins;
     }

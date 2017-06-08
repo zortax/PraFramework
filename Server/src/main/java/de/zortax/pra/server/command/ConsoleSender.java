@@ -4,8 +4,14 @@ import de.zortax.pra.server.ServerManager;
 
 import java.util.logging.Level;
 
+/**
+ * Default implementation for the console command sender
+ */
 public class ConsoleSender implements CommandSender {
 
+    /**
+     * The console command sender instance
+     */
     public static ConsoleSender instance = null;
 
     static {

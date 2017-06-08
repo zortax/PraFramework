@@ -29,12 +29,39 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface PraCommand {
 
+    /**
+     * @return The name of this command
+     */
     String name();
+
+    /**
+     * @return short usage instructions
+     */
     String usage();
+
+    /**
+     * @return a short description of this command
+     */
     String description() default "No description";
+
+    /**
+     * @return the permission that is needed to execute this command
+     */
     String permission() default "none";
+
+    /**
+     * @return the minimum argument count for this command (-1: no limit)
+     */
     int minArgs() default -1;
+
+    /**
+     * @return the maximum argument count for this command (-1: no limit)
+     */
     int maxArgs() default -1;
+
+    /**
+     * @return if this argument should be executed async to the input thread
+     */
     boolean async() default false;
 
 }

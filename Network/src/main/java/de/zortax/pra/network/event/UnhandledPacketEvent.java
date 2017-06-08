@@ -38,6 +38,9 @@ public class UnhandledPacketEvent implements Event, Cancellable {
         this.sourceClient = sourceClient;
     }
 
+    /**
+     * @return the packet that wasn't handled yet
+     */
     public PraPacket getPacket() {
         return packet;
     }

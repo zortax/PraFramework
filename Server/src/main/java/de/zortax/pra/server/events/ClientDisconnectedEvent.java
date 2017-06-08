@@ -23,6 +23,9 @@ package de.zortax.pra.server.events;//  Created by Leonard on 03.03.2017.
 import de.zortax.pra.network.api.Client;
 import de.zortax.pra.network.event.Event;
 
+/**
+ * Gets called when a client just disconnected
+ */
 public class ClientDisconnectedEvent implements Event {
 
     private Client client;
@@ -31,6 +34,9 @@ public class ClientDisconnectedEvent implements Event {
         this.client = client;
     }
 
+    /**
+     * @return the client that just disconnected
+     */
     public Client getClient() {
         return client;
     }

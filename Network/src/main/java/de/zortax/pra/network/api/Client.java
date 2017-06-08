@@ -27,14 +27,48 @@ import java.net.Socket;
 
 public interface Client {
 
+    /**
+     * Starts the thread listening on this client's input stream
+     */
     void start();
+
+    /**
+     * Closes the connection to this client
+     */
     void closeConnection();
+
+    /**
+     * Sends a packet to this client
+     * @param packet the packet to be send
+     * @return true if the packet was sent successfully
+     */
     boolean sendPacket(PraPacket packet);
+
+    /**
+     * @return the plain Socket instance of this client
+     */
     Socket getSocket();
+
+    /**
+     * @return the client's inet address
+     */
     InetAddress getInetAddress();
+
+    /**
+     * @return the client's protocol version
+     */
     int getProtocolVersion();
+
+    /**
+     * @return the client's name
+     */
     default String getClientName() {
         return "";
     }
+
+    /**
+     * @return true if this client is currently connected, false if not
+     */
+    boolean isConnected();
 
 }

@@ -38,6 +38,11 @@ public class ServerManager {
     public static int debugLevel = 10;
     public static boolean debugWithLogger = true;
 
+    /**
+     * Creates a new ServerManager instance
+     * @param bindingIP the IP to bind on
+     * @param port the port to bind on
+     */
     public ServerManager(String bindingIP, int port) {
         logger = Logger.getLogger("PraServer");
         commandManager = new CommandManager();
@@ -45,6 +50,13 @@ public class ServerManager {
         server = new PraServer(bindingIP, port);
     }
 
+    /**
+     * Creates a new ServerManager instance
+     * @param bindingIP the IP to bind on
+     * @param port the port to bind on
+     * @param useCommandSystem if this server manager should use the command system
+     * @param usePluginSystem if this server manager should use the plugin system
+     */
     public ServerManager(String bindingIP, int port, boolean useCommandSystem, boolean usePluginSystem) {
         logger = Logger.getLogger("PraServer");
         if (useCommandSystem)
@@ -55,46 +67,85 @@ public class ServerManager {
         server = new PraServer(bindingIP, port);
     }
 
+    /**
+     * Starts the server
+     */
     public void startServer() {
         server.start();
     }
 
+    /**
+     * Load all plugins
+     * @param pluginPath the path to the folder the plugins are in
+     */
     public void loadPlugins(String pluginPath) {
         pluginLoader.loadPlugins(pluginPath);
     }
 
+    /**
+     * @return the Logger instance
+     */
     public static Logger getLogger() {
         return logger;
     }
 
+    /**
+     * @return the PraServer instance
+     */
     public static PraServer getServer() {
         return server;
     }
 
+    /**
+     * @return the CommandManager instance
+     */
     public CommandManager getCommandManager() {
         return commandManager;
     }
 
+    /**
+     * @return the EventManager instance
+     */
     public EventManager getEventManager() {
         return eventManager;
     }
 
+    /**
+     * @return the PluginLoader instance
+     */
     public PluginLoader getPluginLoader() {
         return pluginLoader;
     }
 
+    /**
+     * En-/Disables the debug logging mode
+     * @param enabled true to enable, false to disable
+     */
     public static void setDebugMode(boolean enabled) {
         debug = enabled;
     }
 
+    /**
+     * Sets the debug level
+     * @param level the debug level
+     */
     public static void setDebugLevel(int level) {
         debugLevel = level;
     }
 
+    /**
+     * Sets if the debug mode should use the java logger
+     * @param logger true for yes, false for no
+     */
     public static void setDebugWithLogger(boolean logger) {
         debugWithLogger = logger;
     }
 
+    /**
+     * Sends a debug message
+     * @param message the message to send
+     * @param level the debug logging level
+     */
     public static void debug(String message, int level) {
         if (debug) {
             if (debugLevel >= level) {

@@ -28,14 +28,24 @@ public class PacketSendEvent implements Event, Cancellable {
         return cancelled;
     }
 
+    /**
+     * @return the packet that was sent
+     */
     public PraPacket getPacket() {
         return packet;
     }
 
+    /**
+     * Sets the packet to send
+     * @param packet the new packet
+     */
     public void setPacket(PraPacket packet) {
         this.packet = packet;
     }
 
+    /**
+     * @return the client this packet is addressed to
+     */
     public Client getTargetClient() {
         return target;
     }

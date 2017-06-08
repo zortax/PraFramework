@@ -36,6 +36,11 @@ public class RequestManager extends PacketHandler {
         RequestManager.client = client;
     }
 
+    /**
+     * Sends a request to the server
+     * @param requestPacket the request packet
+     * @param onAnswer the callback
+     */
     public static void sendRequest(PraPacket requestPacket, Consumer<PraPacket> onAnswer) {
         requestPacket.setRequestFlag(true);
         String reqID = (requestPacket.getTimestamp() + callbacks.size()) + "";
@@ -43,7 +48,7 @@ public class RequestManager extends PacketHandler {
         callbacks.put(reqID, onAnswer);
         client.sendPacket(requestPacket);
     }
-    
+
     @Override
     public void handlePacket(PraPacket packet) {
         if (packet.getRequestFlag()) {

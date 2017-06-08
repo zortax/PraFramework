@@ -24,6 +24,9 @@ import de.zortax.pra.network.PraPacket;
 
 import java.util.HashMap;
 
+/**
+ * Can be used to send some mapped data
+ */
 public class DataPacket extends PraPacket {
 
     private HashMap<String, String> data;

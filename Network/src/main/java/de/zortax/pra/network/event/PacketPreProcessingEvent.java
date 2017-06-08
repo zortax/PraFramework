@@ -15,14 +15,24 @@ public class PacketPreProcessingEvent implements Event {
         this.source = source;
     }
 
+    /**
+     * @return the raw packet data
+     */
     public byte[] getRawData() {
         return rawData;
     }
 
+    /**
+     * @return the client that sent this packet
+     */
     public Client getSourceClient() {
         return source;
     }
 
+    /**
+     * Sets the raw packet data
+     * @param rawData the new raw data
+     */
     public void setRawData(byte[] rawData) {
         this.rawData = rawData;
     }

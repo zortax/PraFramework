@@ -36,10 +36,16 @@ public class HandledPacketEvent implements Event {
         this.sourceClient = sourceClient;
     }
 
+    /**
+     * @return the packet that was handled
+     */
     public PraPacket getPacket() {
         return packet;
     }
 
+    /**
+     * @return the client that sent this packet
+     */
     public Client getSourceClient() {
         return sourceClient;
     }

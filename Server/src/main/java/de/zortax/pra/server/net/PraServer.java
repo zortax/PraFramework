@@ -68,11 +68,17 @@ public class PraServer {
         }
     }
 
+    /**
+     * Starts the server connection listener thread
+     */
     public void start() {
         ServerManager.logger.log(Level.INFO, "Starting connection listener...");
         acceptorThread.start();
     }
 
+    /**
+     * Interrupts the server connection listener thread
+     */
     public void shutdown() {
         acceptorThread.interrupt();
     }
@@ -83,6 +89,10 @@ public class PraServer {
         }
     }
 
+    /**
+     * Registers a new packet handler
+     * @param handler the packet handler instance to add
+     */
     public void addPacketHandler(PacketHandler handler) {
         for (Class<? extends PraPacket> type : handler.getPacketTypes()) {
             if (packetHandlers.containsKey(type)) {
@@ -95,6 +105,11 @@ public class PraServer {
         }
     }
 
+    /**
+     * Gets the packet handlers for a specific packet type
+     * @param packetType the packet type
+     * @return the packet handlers for that tyoe
+     */
     public List<PacketHandler> getHandlersFor(Class<? extends PraPacket> packetType) {
         ArrayList<PacketHandler> list = new ArrayList<>();
         list.addAll(packetHandlers.getOrDefault(packetType, defaultPacketHandler));
@@ -102,10 +117,17 @@ public class PraServer {
         return list;
     }
 
+    /**
+     * @return all clients that are currently connected
+     */
     public List<Client> getClients() {
         return clientHandlerList;
     }
 
+    /**
+     * Sets the ClientAcceptor implementation
+     * @param clientAcceptor the ClientAcceptor instance
+     */
     public void setClientAcceptor(ClientAcceptor clientAcceptor) {
         this.clientAcceptor = clientAcceptor;
     }

@@ -39,22 +39,42 @@ public abstract class PraPlugin {
         this.config = config;
     }
 
+    /**
+     * @return this plugin's name as defined in plugin.json
+     */
     public final String getName() {
         return config.name;
     }
 
+    /**
+     * @return this plugin's version as defined in plugin.json
+     */
     public final String getVersion() {
         return config.version;
     }
 
+    /**
+     * Sends a log message with this plugin's name as prefix
+     * @param level the log level
+     * @param msg the message to log
+     */
     public final void log(Level level, String msg) {
         ServerManager.logger.log(level, "[" + getName() + "] " + msg);
     }
 
+    /**
+     * Gets called when the plugin gets loaded
+     */
     public abstract void onLoad();
 
+    /**
+     * Gets called when the plugin gets enabled
+     */
     public abstract void onEnable();
 
+    /**
+     * Gets called when the plugin gets disabled
+     */
     public abstract void onDisable();
 
 }

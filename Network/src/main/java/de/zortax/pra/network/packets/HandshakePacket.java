@@ -22,6 +22,9 @@ package de.zortax.pra.network.packets;//  Created by Leonard on 03.03.2017.
 
 import de.zortax.pra.network.PraPacket;
 
+/**
+ * Gets sent automatically in the connection process
+ */
 public class HandshakePacket extends PraPacket {
 
     private String serverName;

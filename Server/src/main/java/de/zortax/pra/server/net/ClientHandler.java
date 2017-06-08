@@ -42,6 +42,9 @@ import java.net.Socket;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 
+/**
+ * The default Client implementation
+ */
 public final class ClientHandler extends Thread implements Client {
 
     private Socket client;

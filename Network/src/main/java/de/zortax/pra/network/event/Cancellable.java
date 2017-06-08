@@ -25,7 +25,14 @@ package de.zortax.pra.network.event;//  Created by Leonard on 03.03.2017.
  */
 public interface Cancellable {
 
+    /**
+     * @param cancelled true to cancel this event, false to uncancel it
+     */
     void setCancelled(boolean cancelled);
+
+    /**
+     * @return true if this event was cancelled, false if not
+     */
     boolean isCancelled();
 
 }

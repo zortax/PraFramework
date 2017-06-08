@@ -48,6 +48,15 @@ public class PraClient {
     private static final Object lock = new Object();
 
 
+    /**
+     * Creates a new PraClient instance
+     * @param serverAddress the IP to connect to
+     * @param port the port to connect to
+     * @param defaultPacketHandler the default packet handler
+     * @param clientName this client's name
+     * @param clientVersion this client's version
+     * @param protocolVersion this client's protocol version
+     */
     public PraClient(String serverAddress, int port, PacketHandler defaultPacketHandler, String clientName, String clientVersion, String protocolVersion) {
         try {
             this.socket = new Socket(serverAddress, port);
@@ -67,14 +76,29 @@ public class PraClient {
         }
     }
 
+    /**
+     * Creates a new PraClient instance
+     * @param serverAddress the IP to connect to
+     * @param port the port to connect to
+     */
     public PraClient(String serverAddress, int port) {
         this(serverAddress, port, null, "pra-client", "unknown", "pra_" + PROTOCOL_VERSION);
     }
 
+    /**
+     * Creates a new PraClient instance
+     * @param serverAddress the IP to connect to
+     * @param port the port to connect to
+     * @param clientName this client's name
+     * @param clientVersion this client's version
+     */
     public PraClient(String serverAddress, int port, String clientName, String clientVersion) {
         this(serverAddress, port, null, clientName, clientVersion, "pra_" + PROTOCOL_VERSION);
     }
 
+    /**
+     * Closes the connection to the server
+     */
     public void close() {
         try {
             synchronized (lock) {
@@ -87,6 +111,10 @@ public class PraClient {
         }
     }
 
+    /**
+     * Registers a new packet handler
+     * @param handler the packet handler to add
+     */
     @SuppressWarnings("Duplicates")
     public void addPacketHandler(PacketHandler handler) {
         for (Class<? extends PraPacket> type : handler.getPacketTypes()) {
@@ -100,6 +128,11 @@ public class PraClient {
         }
     }
 
+    /**
+     * Gets all packet handlers for a given packet type
+     * @param packetType the packet type
+     * @return a list of all packet handlers for the given type
+     */
     public List<PacketHandler> getHandlersFor(Class<? extends PraPacket> packetType) {
         ArrayList<PacketHandler> list = new ArrayList<>();
         list.addAll(packetHandlers.getOrDefault(packetType, defaultHandlers));
@@ -107,6 +140,9 @@ public class PraClient {
         return list;
     }
 
+    /**
+     * @return a map of all packet handlers
+     */
     public ConcurrentHashMap<Class<? extends PraPacket>, ArrayList<PacketHandler>> getPacketHandlers() {
         return packetHandlers;
     }
@@ -115,20 +151,30 @@ public class PraClient {
         packetHandlers.putAll(handlers);
     }
 
+    /**
+     * @return if this client is connected to a server
+     */
     public boolean isConnected() {
         return socket != null && socket.isConnected();
     }
 
+    /**
+     * @return the request manager
+     */
     public RequestManager getRequestManager() {
         return requestManager;
     }
 
+    /**
+     * @return the plain socket instance
+     */
     public Socket getSocket() {
         return socket;
     }
 
-    /*
-     * Threadsafe! (Call it async!)
+    /**
+     * Sends a packet to the server
+     * @param packet the packet to send
      */
     public void sendPacket(final PraPacket packet) {
         synchronized (lock) {
@@ -147,6 +193,9 @@ public class PraClient {
         }
     }
 
+    /**
+     * @return the client's event manager
+     */
     public EventManager getEventManager() {
         return eventManager;
     }

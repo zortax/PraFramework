@@ -35,6 +35,9 @@ public class CommandManager {
     private InputThread inputThread;
     private Thread inputThreadObject;
 
+    /**
+     * Creates a new command manager
+     */
     public CommandManager() {
 
         if (ServerManager.commandManager != null)
@@ -51,6 +54,9 @@ public class CommandManager {
         addCommand(HelpCommand.class);
     }
 
+    /**
+     * Starts the thread that reads the commands from the console prompt
+     */
     public void startInputThread() {
         if (inputThreadObject.isAlive())
             throw new IllegalStateException("InputThread is already running!");
@@ -58,6 +64,10 @@ public class CommandManager {
             inputThreadObject.start();
     }
 
+    /**
+     * Adds a new command executor
+     * @param command the class the onCommand method is in
+     */
     public void addCommand(Class command) {
         Method[] methods = command.getDeclaredMethods();
         for (Method method : methods) {
@@ -67,14 +77,27 @@ public class CommandManager {
         }
     }
 
+    /**
+     * Returns all command executors
+     * @return all onCommand methods mapped to their command's name
+     */
     public HashMap<String, Method> getCommands() {
         return commands;
     }
 
+    /**
+     * Returns the input thread
+     * @return the input thread's Thread instance
+     */
     public Thread getInputThread() {
         return inputThreadObject;
     }
 
+    /**
+     * Executes a command with args
+     * @param sender the command sender
+     * @param command the command with arguments
+     */
     public void execute(CommandSender sender, String command) {
         try {
             String[] cmd = command.split(" ");
