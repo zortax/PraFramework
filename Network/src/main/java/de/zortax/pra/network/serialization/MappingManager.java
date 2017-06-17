@@ -10,6 +10,8 @@ public interface MappingManager<T> {
 
     <V> ClassSerializer<V> getSerializer(Class<V> type);
 
+    TypeMapping<T> parseMapping(byte[] bytes);
+
     boolean isCustomMapped(Object obj);
 
     byte[] getDataTypeCode(String name);

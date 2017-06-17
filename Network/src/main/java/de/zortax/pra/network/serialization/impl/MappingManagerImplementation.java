@@ -4,28 +4,32 @@ import de.zortax.pra.network.serialization.ClassSerializer;
 import de.zortax.pra.network.serialization.MappingManager;
 import de.zortax.pra.network.serialization.TypeMapping;
 
-public class MappingManagerImplementation implements MappingManager<Integer> {
+public class MappingManagerImplementation implements MappingManager<Short> {
 
     private StringSerializer stringSerializer;
+    private ByteSerializer byteSerializer;
+    private IntegerSerializer integerSerializer;
 
     public MappingManagerImplementation(String charset) {
         stringSerializer = new StringSerializer(this, charset);
+        byteSerializer = new ByteSerializer(this);
+        integerSerializer = new IntegerSerializer();
     }
 
     @Override
-    public TypeMapping<Integer> getMappingFor(Object object) {
+    public TypeMapping<Short> getMappingFor(Object object) {
 
 
         return null;
     }
 
     @Override
-    public TypeMapping<Integer> getMappingFor(Object object, String name) {
+    public TypeMapping<Short> getMappingFor(Object object, String name) {
         return null;
     }
 
     @Override
-    public byte[] getCode(TypeMapping<Integer> mapping) {
+    public byte[] getCode(TypeMapping<Short> mapping) {
         return new byte[0];
     }
 
@@ -33,8 +37,17 @@ public class MappingManagerImplementation implements MappingManager<Integer> {
     public <V> ClassSerializer<V> getSerializer(Class<V> type) {
         if (type.equals(String.class))
             return (ClassSerializer<V>) stringSerializer;
+        else if (type.equals(byte.class) || type.equals(Byte.class))
+            return (ClassSerializer<V>) byteSerializer;
+        else if (type.equals(int.class) || type.equals(Integer.class))
+            return (ClassSerializer<V>) integerSerializer;
         else
             return null;
+    }
+
+    @Override
+    public TypeMapping<Short> parseMapping(byte[] bytes) {
+        return null;
     }
 
     @Override

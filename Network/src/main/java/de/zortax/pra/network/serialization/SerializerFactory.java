@@ -1,5 +1,7 @@
 package de.zortax.pra.network.serialization;//  Created by leo on 16.06.17.
 
+import de.zortax.pra.network.serialization.impl.MappingManagerImplementation;
+
 public class SerializerFactory {
 
     private boolean useFieldNames;
@@ -7,6 +9,7 @@ public class SerializerFactory {
 
     SerializerFactory() {
         this.useFieldNames = true;
+        this.mappingManager = new MappingManagerImplementation("UTF-8");
     }
 
     public SerializerFactory disableFieldNames() {
@@ -16,6 +19,11 @@ public class SerializerFactory {
 
     public SerializerFactory enableFieldNames() {
         this.useFieldNames = true;
+        return this;
+    }
+
+    public SerializerFactory charset(String charset) {
+        this.mappingManager = new MappingManagerImplementation(charset);
         return this;
     }
 
