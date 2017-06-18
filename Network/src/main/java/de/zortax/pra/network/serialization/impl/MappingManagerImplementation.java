@@ -29,11 +29,17 @@ public class MappingManagerImplementation implements MappingManager<Short> {
     private StringSerializer stringSerializer;
     private ByteSerializer byteSerializer;
     private IntegerSerializer integerSerializer;
+    private BooleanSerializer booleanSerializer;
+    private ShortSerializer shortSerializer;
+    private LongSerializer longSerializer;
 
     public MappingManagerImplementation(String charset) {
         stringSerializer = new StringSerializer(this, charset);
         byteSerializer = new ByteSerializer(this);
         integerSerializer = new IntegerSerializer();
+        booleanSerializer = new BooleanSerializer();
+        shortSerializer = new ShortSerializer();
+        longSerializer = new LongSerializer();
     }
 
     @Override
@@ -53,14 +59,21 @@ public class MappingManagerImplementation implements MappingManager<Short> {
         return new byte[0];
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <V> ClassSerializer<V> getSerializer(Class<V> type) {
         if (type.equals(String.class))
             return (ClassSerializer<V>) stringSerializer;
-        else if (type.equals(byte.class) || type.equals(Byte.class))
+        else if (type.equals(Byte.class))
             return (ClassSerializer<V>) byteSerializer;
-        else if (type.equals(int.class) || type.equals(Integer.class))
+        else if (type.equals(Integer.class))
             return (ClassSerializer<V>) integerSerializer;
+        else if (type.equals(Boolean.class))
+            return (ClassSerializer<V>) booleanSerializer;
+        else if (type.equals(Short.class))
+            return (ClassSerializer<V>) shortSerializer;
+        else if (type.equals(Long.class))
+            return (ClassSerializer<V>) longSerializer;
         else
             return null;
     }
