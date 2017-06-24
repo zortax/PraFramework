@@ -18,20 +18,15 @@
 
  */
 
-package de.zortax.pra.network.serialization.impl;// Created by leo on 17.06.17
+package de.zortax.pra.network.serialization;// Created by leo on 24.06.17
 
-import de.zortax.pra.network.serialization.ClassSerializer;
-import de.zortax.pra.network.serialization.TypeMapping;
+import java.lang.reflect.Field;
 
-public class BooleanSerializer implements ClassSerializer<Boolean> {
+public interface FieldSerializer<T> {
 
-    @Override
-    public byte[] getBytes(Boolean instance, TypeMapping mapping) throws Exception {
-        return new byte[0];
-    }
+    byte[] toBytes(Field f, Object instance) throws IllegalAccessException;
+    String getFieldName(byte[] bytes);
+    T getValue(byte[] bytes);
+    byte[] getBlockFrom(byte[] allData, int index);
 
-    @Override
-    public Boolean getInstance(byte[] bytes) throws Exception {
-        return bytes[0] == MappingCodes.TRUE.getCode();
-    }
 }

@@ -18,28 +18,34 @@
 
  */
 
-package de.zortax.pra.network.serialization.impl;// Created by leo on 16.06.17
+package de.zortax.pra.network.serialization.impl;// Created by leo on 24.06.17
 
-import de.zortax.pra.network.serialization.ClassSerializer;
-import de.zortax.pra.network.serialization.MappingManager;
-import de.zortax.pra.network.serialization.TypeMapping;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import de.zortax.pra.network.serialization.Serializer;
 
-public class ByteSerializer implements ClassSerializer<Byte> {
+public class GsonSerializer implements Serializer {
 
-    private MappingManager mappingManager;
+    private Gson gson;
 
-    public ByteSerializer(MappingManager mappingManager) {
-        this.mappingManager = mappingManager;
+    public GsonSerializer() {
+        this.gson = new Gson();
+    }
+
+    public GsonSerializer(boolean prettyPrinting) {
+        if (prettyPrinting)
+            this.gson = new GsonBuilder().setPrettyPrinting().create();
+        else
+            this.gson = new Gson();
     }
 
     @Override
-    public byte[] getBytes(Byte instance, TypeMapping mapping) throws Exception {
-        return new byte[]{mappingManager.getCode(mapping)[0], instance};
+    public byte[] serialize(Object obj) {
+        return gson.toJson(obj).getBytes();
     }
 
     @Override
-    public Byte getInstance(byte[] bytes) throws Exception {
-        return bytes[1];
+    public <T> T deserialize(byte[] bytes, Class<T> type) {
+        return gson.fromJson(new String(bytes), type);
     }
-
 }

@@ -108,7 +108,7 @@ public class PraServer {
     /**
      * Gets the packet handlers for a specific packet type
      * @param packetType the packet type
-     * @return the packet handlers for that tyoe
+     * @return the packet handlers for that type
      */
     public List<PacketHandler> getHandlersFor(Class<? extends PraPacket> packetType) {
         ArrayList<PacketHandler> list = new ArrayList<>();
