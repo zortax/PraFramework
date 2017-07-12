@@ -29,25 +29,31 @@ import java.io.Serializable;
 
 public abstract class PraPacket implements Serializable {
 
-    private static final transient Gson gson = new Gson();
     private static transient Serializer serializer = new PraSerializer();
     private final Long timestamp = System.currentTimeMillis();
     private boolean requestFlag = false;
     private String requestID = "";
     private String source = "";
 
-    @Override
-    public String toString() {
-        return "<HEADER>" + this.getClass().getName() + "</HEADER>:" + gson.toJson(this);
+    /**
+     * Sets the Serializer implementation used to (de-) serialize packets
+     * @param serializer the Serializer instance
+     */
+    public static void setSerializer(Serializer serializer) {
+        PraPacket.serializer = serializer;
     }
-
 
     /**
      * @return the data that actually being send
      */
     public byte[] getBytes() {
         try {
-            return serializer.serialize(this);
+            String c = this.getClass().getName() + ">";
+            byte[] serialized = serializer.serialize(this);
+            byte[] bytes = new byte[c.getBytes().length + serialized.length];
+            System.arraycopy(c.getBytes(), 0, bytes, 0, c.getBytes().length);
+            System.arraycopy(serialized, 0, bytes, c.getBytes().length, serialized.length);
+            return bytes;
         } catch (IllegalAccessException e) {
             ExceptionHandler.addException(e);
         }
@@ -60,55 +66,11 @@ public abstract class PraPacket implements Serializable {
      * @throws Exception what could actually go wrong?
      */
     public static PraPacket fromBytes(byte[] bytes) throws Exception {
-        return fromJson(new String(bytes));
-    }
-
-    /**
-     * Default Packet deserialization
-     * @param rawPacket raw packet (header + json)
-     * @return PraPacket instance created
-     * @throws Exception That's probably gonna work...
-     */
-    public static PraPacket fromJson(String rawPacket) throws Exception  {
-        if (!rawPacket.contains("<HEADER>") || !rawPacket.contains("</HEADER>:")) {
-            throw new IllegalArgumentException("Wrong Packet format, doesn't contain header!");
-        }
-        String[] split = rawPacket.split(":", 2);
-        if (split.length != 2) {
-            throw new IllegalArgumentException("Wrong Packet format!");
-        }
-        split[0] = split[0].replace("<HEADER>", "").replace("</HEADER>", "");
-        Class<?> clazzUnknown = Class.forName(split[0]);
-
-        if (!clazzUnknown.getSuperclass().equals(PraPacket.class)) {
-            throw new IllegalArgumentException("Class doesn't extend PraPacket!");
-        }
-
-        Class<? extends PraPacket> clazz = (Class<? extends PraPacket>) clazzUnknown;
-        return getPacket(split[1], clazz);
-
-    }
-
-    /**
-     * @param rawPacket raw packet (header + json)
-     * @return the actual packet json without the header
-     */
-    public static String getPacketSerial(String rawPacket) {
-        if (!rawPacket.contains("<HEADER>") || !rawPacket.contains("</HEADER>:")) {
-            return rawPacket;
-        } else {
-            return rawPacket.split(":", 2)[1];
-        }
-    }
-
-    /** Creates an instance of the packet class with json
-     * @param serial the JSON the instance is created with
-     * @param clazz the packet class
-     * @param <T> type of the packet
-     * @return created instance of clazz
-     */
-    public static <T extends PraPacket> T getPacket(String serial, Class<T> clazz) {
-        return gson.fromJson(serial, clazz);
+        String s = new String(bytes);
+        String[] split = s.split(">");
+        byte[] packet = new byte[bytes.length - (split[0].getBytes().length + 1)];
+        System.arraycopy(bytes, bytes.length - packet.length, packet, 0, packet.length);
+        return (PraPacket) serializer.deserialize(packet, Class.forName(split[0]));
     }
 
     /**
