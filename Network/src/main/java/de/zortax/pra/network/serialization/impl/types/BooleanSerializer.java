@@ -22,6 +22,7 @@ package de.zortax.pra.network.serialization.impl.types;// Created by leo on 24.0
 
 import de.zortax.pra.network.serialization.FieldSerializer;
 import de.zortax.pra.network.serialization.impl.TypeCodes;
+import de.zortax.pra.network.serialization.impl.Util;
 
 import java.lang.reflect.Field;
 
@@ -44,16 +45,7 @@ public class BooleanSerializer implements FieldSerializer<Boolean> {
 
     @Override
     public String getFieldName(byte[] bytes) {
-
-        byte[] nameSizeBytes = new byte[2];
-        nameSizeBytes[0] = bytes[1];
-        nameSizeBytes[1] = bytes[2];
-        int nameSize = CharSerializer.fromByteArray(nameSizeBytes);
-
-        byte[] nameBytes = new byte[nameSize];
-        System.arraycopy(bytes, 3, nameBytes, 0, nameBytes.length);
-
-        return new String(nameBytes);
+        return Util.getFieldName(bytes);
     }
 
     @Override
@@ -63,12 +55,6 @@ public class BooleanSerializer implements FieldSerializer<Boolean> {
 
     @Override
     public byte[] getBlockFrom(byte[] allData, int index) {
-        byte[] nameSizeBytes = new byte[2];
-        nameSizeBytes[0] = allData[index + 1];
-        nameSizeBytes[1] = allData[index + 2];
-        int nameSize = CharSerializer.fromByteArray(nameSizeBytes);
-        byte[] block = new byte[nameSize + 3];
-        System.arraycopy(allData, index, block, 0, block.length);
-        return block;
+        return Util.getBlock(allData, index, 0);
     }
 }

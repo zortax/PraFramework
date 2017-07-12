@@ -22,6 +22,7 @@ package de.zortax.pra.network.serialization.impl.types;// Created by leo on 24.0
 
 import de.zortax.pra.network.serialization.FieldSerializer;
 import de.zortax.pra.network.serialization.impl.TypeCodes;
+import de.zortax.pra.network.serialization.impl.Util;
 
 import java.lang.reflect.Field;
 
@@ -29,33 +30,13 @@ public class CharSerializer implements FieldSerializer<Character> {
 
     @Override
     public byte[] toBytes(Field f, Object instance) throws IllegalAccessException {
-
-        char value = (char) f.get(instance);
-        byte[] valueBytes = toByteArray(value);
-        byte[] nameSize = toByteArray((char) f.getName().getBytes().length);
-        byte[] bytes = new byte[f.getName().getBytes().length + 5];
-        bytes[0] = TypeCodes.CHAR.getCode();
-        bytes[1] = nameSize[0];
-        bytes[2] = nameSize[1];
-        for (int i = 0; i < f.getName().getBytes().length; i++)
-            bytes[i + 3] = f.getName().getBytes()[i];
-        bytes[bytes.length - 2] = valueBytes[0];
-        bytes[bytes.length - 1] = valueBytes[1];
-
-        return bytes;
+        byte[] valueBytes = toByteArray((char) f.get(instance));
+        return Util.toBytes(TypeCodes.CHAR, f.getName(), valueBytes);
     }
 
     @Override
     public String getFieldName(byte[] bytes) {
-
-        byte[] nameSize = new byte[2];
-        nameSize[0] = bytes[1];
-        nameSize[1] = bytes[2];
-
-        byte[] name = new byte[(int) fromByteArray(nameSize)];
-        System.arraycopy(bytes, 3, name, 0, name.length);
-
-        return new String(name);
+        return Util.getFieldName(bytes);
     }
 
     @Override
@@ -65,18 +46,7 @@ public class CharSerializer implements FieldSerializer<Character> {
 
     @Override
     public byte[] getBlockFrom(byte[] allData, int index) {
-
-        byte[] nameSizeChar = new byte[2];
-        nameSizeChar[0] = allData[index + 1];
-        nameSizeChar[1] = allData[index + 2];
-        int nameSize = (int) fromByteArray(nameSizeChar);
-        int size = nameSize + 5;
-
-        byte[] block = new byte[size];
-
-        System.arraycopy(allData, index, block, 0, block.length);
-
-        return block;
+        return Util.getBlock(allData, index, 2);
     }
 
     public static byte[] toByteArray(char character) {

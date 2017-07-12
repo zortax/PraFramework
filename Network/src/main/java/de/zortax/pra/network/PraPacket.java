@@ -21,12 +21,16 @@
 package de.zortax.pra.network;//  Created by Leonard on 03.03.2017.
 
 import com.google.gson.Gson;
+import de.zortax.pra.network.error.ExceptionHandler;
+import de.zortax.pra.network.serialization.Serializer;
+import de.zortax.pra.network.serialization.impl.PraSerializer;
 
 import java.io.Serializable;
 
 public abstract class PraPacket implements Serializable {
 
     private static final transient Gson gson = new Gson();
+    private static transient Serializer serializer = new PraSerializer();
     private final Long timestamp = System.currentTimeMillis();
     private boolean requestFlag = false;
     private String requestID = "";
@@ -42,7 +46,12 @@ public abstract class PraPacket implements Serializable {
      * @return the data that actually being send
      */
     public byte[] getBytes() {
-        return toString().getBytes();
+        try {
+            return serializer.serialize(this);
+        } catch (IllegalAccessException e) {
+            ExceptionHandler.addException(e);
+        }
+        return null;
     }
 
     /**

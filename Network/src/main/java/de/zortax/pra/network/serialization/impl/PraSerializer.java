@@ -21,9 +21,7 @@
 package de.zortax.pra.network.serialization.impl;// Created by leo on 24.06.17
 
 import de.zortax.pra.network.serialization.*;
-import de.zortax.pra.network.serialization.impl.types.BooleanSerializer;
-import de.zortax.pra.network.serialization.impl.types.CharSerializer;
-import de.zortax.pra.network.serialization.impl.types.IntegerSerializer;
+import de.zortax.pra.network.serialization.impl.types.*;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
@@ -57,6 +55,8 @@ public class PraSerializer implements Serializer {
     private FieldSerializer<Boolean> booleanSerializer;
 
     public PraSerializer() {
+        this.byteSerializer = new ByteSerializer();
+        this.shortSerializer = new ShortSerializer();
         this.integerSerializer = new IntegerSerializer();
         this.characterSerializer = new CharSerializer();
         this.booleanSerializer = new BooleanSerializer();

@@ -22,6 +22,7 @@ package de.zortax.pra.network.serialization.impl.types;// Created by Leonard on 
 
 import de.zortax.pra.network.serialization.FieldSerializer;
 import de.zortax.pra.network.serialization.impl.TypeCodes;
+import de.zortax.pra.network.serialization.impl.Util;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -30,39 +31,13 @@ public class IntegerSerializer implements FieldSerializer<Integer> {
 
     @Override
     public byte[] toBytes(Field f, Object instance) throws IllegalAccessException {
-
-        ArrayList<Byte> bytes = new ArrayList<>();
-        bytes.add(TypeCodes.INT.getCode());
-
-        byte[] nameSize = CharSerializer.toByteArray((char) f.getName().getBytes().length);
-        bytes.add(nameSize[0]);
-        bytes.add(nameSize[1]);
-        for (byte b : f.getName().getBytes())
-            bytes.add(b);
-
-        if (f.getType().equals(int.class)) {
-            for (byte b : toByteArray(f.getInt(instance)))
-                bytes.add(b);
-        } else if (f.getType().equals(Integer.class)) {
-            for (byte b : toByteArray((Integer) f.get(instance)))
-                bytes.add(b);
-        } else throw new IllegalArgumentException("Wrong Fieldserializer for this type!");
-
-        byte[] b = new byte[bytes.size()];
-        for (int i = 0; i < bytes.size(); i++)
-            b[i] = bytes.get(i);
-        return b;
+        byte[] bytes = toByteArray((int) f.get(instance));
+        return Util.toBytes(TypeCodes.INT, f.getName(), bytes);
     }
 
     @Override
     public String getFieldName(byte[] bytes) {
-        byte[] nameSize = new byte[2];
-        nameSize[0] = bytes[1];
-        nameSize[1] = bytes[2];
-        int nameLength = CharSerializer.fromByteArray(nameSize);
-        byte[] name = new byte[nameLength];
-        System.arraycopy(bytes, 3, name, 0, nameLength);
-        return new String(name);
+        return Util.getFieldName(bytes);
     }
 
     @Override
@@ -74,26 +49,7 @@ public class IntegerSerializer implements FieldSerializer<Integer> {
 
     @Override
     public byte[] getBlockFrom(byte[] allData, int index) {
-        ArrayList<Byte> bytes = new ArrayList<>();
-        bytes.add(allData[index]);
-        bytes.add(allData[index + 1]);
-        bytes.add(allData[index + 2]);
-
-        byte[] nameSizeBytes = new byte[2];
-        nameSizeBytes[0] = allData[index + 1];
-        nameSizeBytes[1] = allData[index + 2];
-        int nameSize = CharSerializer.fromByteArray(nameSizeBytes);
-        for (int i = 0; i < nameSize; i++)
-            bytes.add(allData[index + 3 + i]);
-
-        for (int i = 0; i < 4; i++)
-            bytes.add(allData[index + 3 + nameSize + i]);
-
-        byte[] byteArray = new byte[bytes.size()];
-        for (int i = 0; i < bytes.size(); i++)
-            byteArray[i] = bytes.get(i);
-
-        return byteArray;
+        return Util.getBlock(allData, index, 4);
     }
 
     public static byte[] toByteArray(int integer) {
