@@ -41,7 +41,7 @@ public class CharSerializer implements FieldSerializer<Character> {
 
     @Override
     public Character getValue(byte[] bytes) {
-        return fromByteArray(new byte[]{bytes[bytes.length - 2], bytes[bytes.length - 1]});
+        return fromByteArray(Util.getValueBytes(bytes, 2));
     }
 
     @Override

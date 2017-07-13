@@ -20,7 +20,6 @@
 
 package de.zortax.pra.network;//  Created by Leonard on 03.03.2017.
 
-import com.google.gson.Gson;
 import de.zortax.pra.network.error.ExceptionHandler;
 import de.zortax.pra.network.serialization.Serializer;
 import de.zortax.pra.network.serialization.impl.PraSerializer;
@@ -115,4 +114,3 @@ public abstract class PraPacket implements Serializable {
         return source;
     }
 }
-

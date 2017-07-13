@@ -54,4 +54,10 @@ public class Util {
         return bytes;
     }
 
+    public static byte[] getValueBytes(byte[] bytes, int valueSize) {
+        byte[] value = new byte[valueSize];
+        System.arraycopy(bytes, bytes.length - valueSize, value, 0, valueSize);
+        return value;
+    }
+
 }

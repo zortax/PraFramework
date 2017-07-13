@@ -58,6 +58,7 @@ public class PraSerializer implements Serializer {
         this.byteSerializer = new ByteSerializer();
         this.shortSerializer = new ShortSerializer();
         this.integerSerializer = new IntegerSerializer();
+        this.longSerializer = new LongSerializer();
         this.characterSerializer = new CharSerializer();
         this.stringSerializer = new StringSerializer();
         this.booleanSerializer = new BooleanSerializer();
