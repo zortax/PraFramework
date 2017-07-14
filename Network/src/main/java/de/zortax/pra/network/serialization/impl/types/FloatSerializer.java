@@ -18,21 +18,19 @@
 
  */
 
-package de.zortax.pra.network.serialization.impl.types;// Created by Leonard on 09.07.2017
+package de.zortax.pra.network.serialization.impl.types;//  Created by leo on 14.07.17.
 
 import de.zortax.pra.network.serialization.FieldSerializer;
 import de.zortax.pra.network.serialization.impl.TypeCodes;
 import de.zortax.pra.network.serialization.impl.Util;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 
-public class IntegerSerializer implements FieldSerializer<Integer> {
+public class FloatSerializer implements FieldSerializer<Float> {
 
     @Override
     public byte[] toBytes(Field f, Object instance) throws IllegalAccessException {
-        byte[] bytes = toByteArray((int) f.get(instance));
-        return Util.toBytes(TypeCodes.INT, f.getName(), bytes);
+        return Util.toBytes(TypeCodes.FLOAT, f.getName(), toByteArray((float) f.get(instance)));
     }
 
     @Override
@@ -41,10 +39,8 @@ public class IntegerSerializer implements FieldSerializer<Integer> {
     }
 
     @Override
-    public Integer getValue(byte[] bytes) {
-        byte[] intBytes = new byte[4];
-        System.arraycopy(bytes, bytes.length - 4, intBytes, 0, 4);
-        return fromByteArray(intBytes);
+    public Float getValue(byte[] bytes) {
+        return fromByteArray(Util.getValueBytes(bytes, 4));
     }
 
     @Override
@@ -52,16 +48,17 @@ public class IntegerSerializer implements FieldSerializer<Integer> {
         return Util.getBlock(allData, index, 4);
     }
 
-    public static byte[] toByteArray(int integer) {
+    public static byte[] toByteArray(float value) {
+        Float f = new Float(value);
         return new byte[] {
-                (byte) (integer >> 24),
-                (byte) (integer >> 16),
-                (byte) (integer >> 8),
-                (byte) integer
+                (byte) (f.byteValue() >>> 24),
+                (byte) (f.byteValue() >>> 16),
+                (byte) (f.byteValue() >>> 8),
+                f.byteValue()
         };
     }
 
-    public static int fromByteArray(byte[] array) {
+    public static float fromByteArray(byte[] array) {
         return (array[0] << 24 | (array[1] & 0xFF) << 16 | (array[2] & 0xFF) << 8) | (array[3] & 0xFF);
     }
 

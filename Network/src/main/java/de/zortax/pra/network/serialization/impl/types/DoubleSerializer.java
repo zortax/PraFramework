@@ -18,21 +18,19 @@
 
  */
 
-package de.zortax.pra.network.serialization.impl.types;// Created by Leonard on 09.07.2017
+package de.zortax.pra.network.serialization.impl.types;//  Created by leo on 14.07.17.
 
 import de.zortax.pra.network.serialization.FieldSerializer;
 import de.zortax.pra.network.serialization.impl.TypeCodes;
 import de.zortax.pra.network.serialization.impl.Util;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 
-public class IntegerSerializer implements FieldSerializer<Integer> {
+public class DoubleSerializer implements FieldSerializer<Double> {
 
     @Override
     public byte[] toBytes(Field f, Object instance) throws IllegalAccessException {
-        byte[] bytes = toByteArray((int) f.get(instance));
-        return Util.toBytes(TypeCodes.INT, f.getName(), bytes);
+        return Util.toBytes(TypeCodes.DOUBLE, f.getName(), toByteArray((double) f.get(instance)));
     }
 
     @Override
@@ -41,28 +39,39 @@ public class IntegerSerializer implements FieldSerializer<Integer> {
     }
 
     @Override
-    public Integer getValue(byte[] bytes) {
-        byte[] intBytes = new byte[4];
-        System.arraycopy(bytes, bytes.length - 4, intBytes, 0, 4);
-        return fromByteArray(intBytes);
+    public Double getValue(byte[] bytes) {
+        return fromByteArray(Util.getValueBytes(bytes, 8));
     }
 
     @Override
     public byte[] getBlockFrom(byte[] allData, int index) {
-        return Util.getBlock(allData, index, 4);
+        return Util.getBlock(allData, index, 8);
     }
 
-    public static byte[] toByteArray(int integer) {
+    public static byte[] toByteArray(double value) {
+        Double d = new Double(value);
         return new byte[] {
-                (byte) (integer >> 24),
-                (byte) (integer >> 16),
-                (byte) (integer >> 8),
-                (byte) integer
+                (byte) (d.byteValue() >>> 56),
+                (byte) (d.byteValue() >>> 48),
+                (byte) (d.byteValue() >>> 40),
+                (byte) (d.byteValue() >>> 32),
+                (byte) (d.byteValue() >>> 24),
+                (byte) (d.byteValue() >>> 16),
+                (byte) (d.byteValue() >>> 8),
+                d.byteValue()
         };
     }
 
-    public static int fromByteArray(byte[] array) {
-        return (array[0] << 24 | (array[1] & 0xFF) << 16 | (array[2] & 0xFF) << 8) | (array[3] & 0xFF);
+    public static double fromByteArray(byte[] array) {
+        return (array[0] << 56
+                | (array[1] & 0xFF) << 48
+                | (array[2] & 0xFF) << 40
+                | (array[3] & 0xFF) << 32
+                | (array[4] & 0xFF) << 24
+                | (array[5] & 0xFF) << 16
+                | (array[6] & 0xFF) << 8
+                | (array[7] & 0xFF)
+        );
     }
 
 }
