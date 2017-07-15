@@ -30,8 +30,7 @@ public class ShortSerializer implements FieldSerializer<Short> {
 
     @Override
     public byte[] toBytes(Field f, Object instance) throws IllegalAccessException {
-        byte[] bytes = toByteArray((short) f.get(instance));
-        return Util.toBytes(TypeCodes.SHORT, f.getName(), bytes);
+        return Util.toBytes(TypeCodes.SHORT, f.getName(), toByteArray((short) f.get(instance)));
     }
 
     @Override
