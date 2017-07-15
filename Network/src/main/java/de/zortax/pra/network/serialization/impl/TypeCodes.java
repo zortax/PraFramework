@@ -74,4 +74,29 @@ public enum TypeCodes {
         }
     }
 
+    public static TypeCodes fromClass(Class clazz) {
+        if (clazz.isArray())
+            return ARRAY;
+        else if (clazz.equals(byte.class) || clazz.equals(Byte.class))
+            return  BYTE;
+        else if (clazz.equals(short.class) || clazz.equals(Short.class))
+            return SHORT;
+        else if (clazz.equals(int.class) || clazz.equals(Integer.class))
+            return INT;
+        else if (clazz.equals(long.class) || clazz.equals(Long.class))
+            return LONG;
+        else if (clazz.equals(float.class) || clazz.equals(Float.class))
+            return FLOAT;
+        else if (clazz.equals(double.class) || clazz.equals(Double.class))
+            return DOUBLE;
+        else if (clazz.equals(char.class) || clazz.equals(Character.class))
+            return CHAR;
+        else if (clazz.equals(String.class))
+            return STRING;
+        else if (clazz.equals(boolean.class) || clazz.equals(Boolean.class))
+            return BOOLEAN_TRUE;
+        else
+            return COMPLEX;
+    }
+
 }

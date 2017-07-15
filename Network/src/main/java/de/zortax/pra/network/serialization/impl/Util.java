@@ -60,4 +60,16 @@ public class Util {
         return value;
     }
 
+    public static int getArrayDimensions(Object array) {
+        if (!array.getClass().isArray())
+            throw new IllegalArgumentException("Object must be an array!");
+        int dimensions = 1;
+        Class elementType = array.getClass().getComponentType();
+        while (elementType.isArray()) {
+            dimensions++;
+            elementType = elementType.getComponentType();
+        }
+        return dimensions;
+    }
+
 }
