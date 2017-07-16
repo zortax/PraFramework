@@ -61,15 +61,28 @@ public class Util {
     }
 
     public static int getArrayDimensions(Object array) {
-        if (!array.getClass().isArray())
+        return getArrayDimensions(array.getClass());
+    }
+
+    public static int getArrayDimensions(Class clazz) {
+        if (!clazz.isArray())
             throw new IllegalArgumentException("Object must be an array!");
         int dimensions = 1;
-        Class elementType = array.getClass().getComponentType();
+        Class elementType = clazz.getComponentType();
         while (elementType.isArray()) {
             dimensions++;
             elementType = elementType.getComponentType();
         }
         return dimensions;
+    }
+
+    public static Class getArrayComponentType(Class arrayClass) {
+        if (!arrayClass.isArray())
+            throw new IllegalArgumentException("Class must be an array class!");
+        Class componentType = arrayClass.getComponentType();
+        while (componentType.isArray())
+            componentType = componentType.getComponentType();
+        return componentType;
     }
 
 }

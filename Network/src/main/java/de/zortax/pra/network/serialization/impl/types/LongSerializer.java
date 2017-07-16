@@ -39,7 +39,7 @@ public class LongSerializer implements FieldSerializer<Long> {
 
     public static byte[] toByteArray(long value) {
         byte[] bytes = new byte[8];
-        for (int i = 7; i >= 0; i++) {
+        for (int i = 7; i >= 0; i--) {
             bytes[i] = (byte) (value & 0xFF);
             value >>= 8;
         }

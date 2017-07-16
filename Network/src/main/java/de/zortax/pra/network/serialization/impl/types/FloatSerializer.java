@@ -49,17 +49,11 @@ public class FloatSerializer implements FieldSerializer<Float> {
     }
 
     public static byte[] toByteArray(float value) {
-        Float f = new Float(value);
-        return new byte[] {
-                (byte) (f.byteValue() >>> 24),
-                (byte) (f.byteValue() >>> 16),
-                (byte) (f.byteValue() >>> 8),
-                f.byteValue()
-        };
+        return IntegerSerializer.toByteArray(Float.floatToRawIntBits(value));
     }
 
     public static float fromByteArray(byte[] array) {
-        return (array[0] << 24 | (array[1] & 0xFF) << 16 | (array[2] & 0xFF) << 8) | (array[3] & 0xFF);
+        return Float.intBitsToFloat(IntegerSerializer.fromByteArray(array));
     }
 
 }

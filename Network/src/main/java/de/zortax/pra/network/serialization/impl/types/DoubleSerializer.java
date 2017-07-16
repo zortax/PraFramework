@@ -49,29 +49,11 @@ public class DoubleSerializer implements FieldSerializer<Double> {
     }
 
     public static byte[] toByteArray(double value) {
-        Double d = new Double(value);
-        return new byte[] {
-                (byte) (d.byteValue() >>> 56),
-                (byte) (d.byteValue() >>> 48),
-                (byte) (d.byteValue() >>> 40),
-                (byte) (d.byteValue() >>> 32),
-                (byte) (d.byteValue() >>> 24),
-                (byte) (d.byteValue() >>> 16),
-                (byte) (d.byteValue() >>> 8),
-                d.byteValue()
-        };
+        return LongSerializer.toByteArray(Double.doubleToRawLongBits(value));
     }
 
-    public static double fromByteArray(byte[] array) {
-        return (array[0] << 56
-                | (array[1] & 0xFF) << 48
-                | (array[2] & 0xFF) << 40
-                | (array[3] & 0xFF) << 32
-                | (array[4] & 0xFF) << 24
-                | (array[5] & 0xFF) << 16
-                | (array[6] & 0xFF) << 8
-                | (array[7] & 0xFF)
-        );
+    public static double fromByteArray(byte[] bytes) {
+        return Double.longBitsToDouble(LongSerializer.fromByteArray(bytes));
     }
 
 }

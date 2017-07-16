@@ -20,7 +20,8 @@
 
 package de.zortax.pra.network.serialization.impl;// Created by leo on 24.06.17
 
-import de.zortax.pra.network.serialization.*;
+import de.zortax.pra.network.serialization.FieldSerializer;
+import de.zortax.pra.network.serialization.Serializer;
 import de.zortax.pra.network.serialization.impl.types.*;
 import sun.misc.Unsafe;
 
@@ -55,6 +56,7 @@ public class PraSerializer implements Serializer {
     private FieldSerializer<Boolean> booleanSerializer;
 
     public PraSerializer() {
+        this.arraySerializer = new ArraySerializer(this);
         this.byteSerializer = new ByteSerializer();
         this.shortSerializer = new ShortSerializer();
         this.integerSerializer = new IntegerSerializer();
@@ -69,215 +71,275 @@ public class PraSerializer implements Serializer {
     @Override
     public byte[] serialize(Object obj) throws IllegalAccessException {
 
-        ArrayList<Byte> allBytes = new ArrayList<>();
+        if (obj.getClass().equals(byte.class) || obj instanceof Byte)
+            return new byte[]{(byte) obj};
+        else if (obj.getClass().equals(boolean.class) || obj instanceof Boolean)
+            return (boolean) obj ? new byte[]{TypeCodes.BOOLEAN_TRUE.getCode()} : new byte[]{TypeCodes.BOOLEAN_FALSE.getCode()};
+        else if (obj.getClass().equals(char.class) || obj instanceof Character)
+            return CharSerializer.toByteArray((char) obj);
+        else if (obj.getClass().equals(short.class) || obj instanceof Short)
+            return ShortSerializer.toByteArray((short) obj);
+        else if (obj.getClass().equals(int.class) || obj instanceof Integer)
+            return IntegerSerializer.toByteArray((int) obj);
+        else if (obj.getClass().equals(long.class) || obj instanceof Long)
+            return LongSerializer.toByteArray((long) obj);
+        else if (obj.getClass().equals(float.class) || obj instanceof Float)
+            return FloatSerializer.toByteArray((float) obj);
+        else if (obj.getClass().equals(double.class) || obj instanceof Double)
+            return DoubleSerializer.toByteArray((double) obj);
+        else if (obj instanceof String)
+            return ((String) obj).getBytes();
+        else if (obj.getClass().isArray())
+            return ArraySerializer.toByteArray(obj, this);
+        else {
 
-        for (Field f : obj.getClass().getDeclaredFields()) {
-            if (!Modifier.isStatic(f.getModifiers()) && !Modifier.isTransient(f.getModifiers())) {
-                f.setAccessible(true);
-                if (f.getType().isArray()) {
-                    for (byte b : arraySerializer.toBytes(f, obj))
-                        allBytes.add(b);
-                } else if (f.getType().equals(byte.class) || f.getType().equals(Byte.class)) {
-                    for (byte b : byteSerializer.toBytes(f, obj))
-                        allBytes.add(b);
-                } else if (f.getType().equals(short.class) || f.getType().equals(Short.class)) {
-                    for (byte b : shortSerializer.toBytes(f, obj))
-                        allBytes.add(b);
-                } else if (f.getType().equals(int.class) || f.getType().equals(Integer.class)) {
-                    for (byte b : integerSerializer.toBytes(f, obj))
-                        allBytes.add(b);
-                } else if (f.getType().equals(long.class) || f.getType().equals(Long.class)) {
-                    for (byte b : longSerializer.toBytes(f, obj))
-                        allBytes.add(b);
-                } else if (f.getType().equals(float.class) || f.getType().equals(Float.class)) {
-                    for (byte b : floatSerializer.toBytes(f, obj))
-                        allBytes.add(b);
-                } else if (f.getType().equals(double.class) || f.getType().equals(Double.class)) {
-                    for (byte b : doubleSerializer.toBytes(f, obj))
-                        allBytes.add(b);
-                } else if (f.getType().equals(char.class) || f.getType().equals(Character.class)) {
-                    for (byte b : characterSerializer.toBytes(f, obj))
-                        allBytes.add(b);
-                } else if (f.getType().equals(String.class)) {
-                    for (byte b : stringSerializer.toBytes(f, obj))
-                        allBytes.add(b);
-                } else if (f.getType().equals(boolean.class) || f.getType().equals(Boolean.class)) {
-                    for (byte b : booleanSerializer.toBytes(f, obj))
-                        allBytes.add(b);
-                } else {
-                    byte[] data = serialize(f.get(obj));
-                    byte[] name = f.getName().getBytes();
-                    byte[] nameSize = CharSerializer.toByteArray((char) name.length);
-                    byte[] dataSize = CharSerializer.toByteArray((char) data.length);
-                    byte[] type = f.get(obj).getClass().getName().getBytes();
-                    byte[] typeSize = CharSerializer.toByteArray((char) type.length);
+            ArrayList<Byte> allBytes = new ArrayList<>();
 
-                    allBytes.add(TypeCodes.COMPLEX.getCode());
+            for (Field f : obj.getClass().getDeclaredFields()) {
+                if (!Modifier.isStatic(f.getModifiers()) && !Modifier.isTransient(f.getModifiers())) {
+                    f.setAccessible(true);
+                    if (f.getType().isArray()) {
+                        for (byte b : arraySerializer.toBytes(f, obj))
+                            allBytes.add(b);
+                    } else if (f.getType().equals(byte.class) || f.getType().equals(Byte.class)) {
+                        for (byte b : byteSerializer.toBytes(f, obj))
+                            allBytes.add(b);
+                    } else if (f.getType().equals(short.class) || f.getType().equals(Short.class)) {
+                        for (byte b : shortSerializer.toBytes(f, obj))
+                            allBytes.add(b);
+                    } else if (f.getType().equals(int.class) || f.getType().equals(Integer.class)) {
+                        for (byte b : integerSerializer.toBytes(f, obj))
+                            allBytes.add(b);
+                    } else if (f.getType().equals(long.class) || f.getType().equals(Long.class)) {
+                        for (byte b : longSerializer.toBytes(f, obj))
+                            allBytes.add(b);
+                    } else if (f.getType().equals(float.class) || f.getType().equals(Float.class)) {
+                        for (byte b : floatSerializer.toBytes(f, obj))
+                            allBytes.add(b);
+                    } else if (f.getType().equals(double.class) || f.getType().equals(Double.class)) {
+                        for (byte b : doubleSerializer.toBytes(f, obj))
+                            allBytes.add(b);
+                    } else if (f.getType().equals(char.class) || f.getType().equals(Character.class)) {
+                        for (byte b : characterSerializer.toBytes(f, obj))
+                            allBytes.add(b);
+                    } else if (f.getType().equals(String.class)) {
+                        for (byte b : stringSerializer.toBytes(f, obj))
+                            allBytes.add(b);
+                    } else if (f.getType().equals(boolean.class) || f.getType().equals(Boolean.class)) {
+                        for (byte b : booleanSerializer.toBytes(f, obj))
+                            allBytes.add(b);
+                    } else {
+                        byte[] data = serialize(f.get(obj));
+                        byte[] name = f.getName().getBytes();
+                        byte[] nameSize = CharSerializer.toByteArray((char) name.length);
+                        byte[] dataSize = CharSerializer.toByteArray((char) data.length);
+                        byte[] type = f.get(obj).getClass().getName().getBytes();
+                        byte[] typeSize = CharSerializer.toByteArray((char) type.length);
 
-                    for (byte b : nameSize)
-                        allBytes.add(b);
-                    for (byte b : name)
-                        allBytes.add(b);
-                    for (byte b : typeSize)
-                        allBytes.add(b);
-                    for (byte b : type)
-                        allBytes.add(b);
-                    for (byte b : dataSize)
-                        allBytes.add(b);
-                    for (byte b : data)
-                        allBytes.add(b);
+                        allBytes.add(TypeCodes.COMPLEX.getCode());
+
+                        for (byte b : nameSize)
+                            allBytes.add(b);
+                        for (byte b : name)
+                            allBytes.add(b);
+                        for (byte b : typeSize)
+                            allBytes.add(b);
+                        for (byte b : type)
+                            allBytes.add(b);
+                        for (byte b : dataSize)
+                            allBytes.add(b);
+                        for (byte b : data)
+                            allBytes.add(b);
+                    }
+
                 }
-
             }
-        }
 
-        byte[] bytes = new byte[allBytes.size()];
-        for (int i = 0; i < bytes.length; i++)
-            bytes[i] = allBytes.get(i);
-        return bytes;
+            byte[] bytes = new byte[allBytes.size()];
+            for (int i = 0; i < bytes.length; i++)
+                bytes[i] = allBytes.get(i);
+            return bytes;
+        }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T deserialize(byte[] bytes, Class<T> type)
             throws IllegalAccessException, InstantiationException, NoSuchFieldException, ClassNotFoundException, InvocationTargetException {
 
-        T instance = type.cast(unsafe.allocateInstance(type));
+        if (type.equals(byte.class) || type.equals(Byte.class))
+            return (T) new Byte(bytes[0]);
+        else if (type.equals(boolean.class) || type.equals(Boolean.class))
+            return (T) (TypeCodes.fromCode(bytes[0]).equals(TypeCodes.BOOLEAN_TRUE) ? Boolean.TRUE : Boolean.FALSE);
+        else if (type.equals(char.class) || type.equals(Character.class))
+            return (T) new Character(CharSerializer.fromByteArray(bytes));
+        else if (type.equals(short.class) || type.equals(Short.class))
+            return (T) new Short(ShortSerializer.fromByteArray(bytes));
+        else if (type.equals(int.class) || type.equals(Integer.class))
+            return (T) new Integer(IntegerSerializer.fromByteArray(bytes));
+        else if (type.equals(long.class) || type.equals(Long.class))
+            return (T) new Long(LongSerializer.fromByteArray(bytes));
+        else if (type.equals(float.class) || type.equals(Float.class))
+            return (T) new Float(FloatSerializer.fromByteArray(bytes));
+        else if (type.equals(double.class) || type.equals(Double.class))
+            return (T) new Double(DoubleSerializer.fromByteArray(bytes));
+        else if (type.equals(String.class))
+            return (T) new String(bytes);
+        else if (type.isArray())
+            return ArraySerializer.fromByteArray(bytes, type, this).getArray(type);
+        else {
 
-        for (int i = 0; i < bytes.length;) {
-            byte[] block = new byte[0];
-            Field f;
+            T instance = type.cast(unsafe.allocateInstance(type));
 
-            switch (TypeCodes.fromCode(bytes[i])) {
-                case BYTE:
+            for (int i = 0; i < bytes.length; ) {
+                byte[] block = new byte[0];
+                Field f;
 
-                    block = byteSerializer.getBlockFrom(bytes, i);
-                    f = type.getDeclaredField(byteSerializer.getFieldName(block));
-                    f.setAccessible(true);
-                    f.set(instance, f.getType().equals(byte.class) ? byteSerializer.getValue(block).byteValue() : byteSerializer.getValue(block));
+                switch (TypeCodes.fromCode(bytes[i])) {
+                    case BYTE:
 
-                    break;
-                case SHORT:
+                        block = byteSerializer.getBlockFrom(bytes, i);
+                        f = type.getDeclaredField(byteSerializer.getFieldName(block));
+                        f.setAccessible(true);
+                        f.set(instance, f.getType().equals(byte.class) ? byteSerializer.getValue(block).byteValue() : byteSerializer.getValue(block));
 
-                    block = shortSerializer.getBlockFrom(bytes, i);
-                    f = type.getDeclaredField(shortSerializer.getFieldName(block));
-                    f.setAccessible(true);
-                    f.set(instance, f.getType().equals(short.class) ? shortSerializer.getValue(block).shortValue() : shortSerializer.getValue(block));
+                        break;
+                    case SHORT:
 
-                    break;
-                case INT:
+                        block = shortSerializer.getBlockFrom(bytes, i);
+                        f = type.getDeclaredField(shortSerializer.getFieldName(block));
+                        f.setAccessible(true);
+                        f.set(instance, f.getType().equals(short.class) ? shortSerializer.getValue(block).shortValue() : shortSerializer.getValue(block));
 
-                    block = integerSerializer.getBlockFrom(bytes, i);
-                    f = type.getDeclaredField(shortSerializer.getFieldName(block));
-                    f.setAccessible(true);
-                    f.set(instance, f.getType().equals(int.class) ? integerSerializer.getValue(block).intValue() : integerSerializer.getValue(block));
+                        break;
+                    case INT:
 
-                    break;
-                case LONG:
+                        block = integerSerializer.getBlockFrom(bytes, i);
+                        f = type.getDeclaredField(shortSerializer.getFieldName(block));
+                        f.setAccessible(true);
+                        f.set(instance, f.getType().equals(int.class) ? integerSerializer.getValue(block).intValue() : integerSerializer.getValue(block));
 
-                    block = longSerializer.getBlockFrom(bytes, i);
-                    f = type.getDeclaredField(longSerializer.getFieldName(block));
-                    f.setAccessible(true);
-                    f.set(instance, f.getType().equals(long.class) ? longSerializer.getValue(block).longValue() : longSerializer.getValue(block));
+                        break;
+                    case LONG:
 
-                    break;
-                case FLOAT:
+                        block = longSerializer.getBlockFrom(bytes, i);
+                        f = type.getDeclaredField(longSerializer.getFieldName(block));
+                        f.setAccessible(true);
+                        f.set(instance, f.getType().equals(long.class) ? longSerializer.getValue(block).longValue() : longSerializer.getValue(block));
 
-                    block = floatSerializer.getBlockFrom(bytes, i);
-                    f = type.getDeclaredField(floatSerializer.getFieldName(block));
-                    f.setAccessible(true);
-                    f.set(instance, f.getType().equals(float.class) ? floatSerializer.getValue(block).floatValue() : floatSerializer.getValue(block));
+                        break;
+                    case FLOAT:
 
-                    break;
-                case DOUBLE:
+                        block = floatSerializer.getBlockFrom(bytes, i);
+                        f = type.getDeclaredField(floatSerializer.getFieldName(block));
+                        f.setAccessible(true);
+                        f.set(instance, f.getType().equals(float.class) ? floatSerializer.getValue(block).floatValue() : floatSerializer.getValue(block));
 
-                    block = doubleSerializer.getBlockFrom(bytes, i);
-                    f = type.getDeclaredField(doubleSerializer.getFieldName(block));
-                    f.setAccessible(true);
-                    f.set(instance, f.getType().equals(double.class) ? doubleSerializer.getValue(block).doubleValue() : doubleSerializer.getValue(block));
+                        break;
+                    case DOUBLE:
 
-                    break;
-                case CHAR:
+                        block = doubleSerializer.getBlockFrom(bytes, i);
+                        f = type.getDeclaredField(doubleSerializer.getFieldName(block));
+                        f.setAccessible(true);
+                        f.set(instance, f.getType().equals(double.class) ? doubleSerializer.getValue(block).doubleValue() : doubleSerializer.getValue(block));
 
-                    block = characterSerializer.getBlockFrom(bytes, i);
-                    f = type.getDeclaredField(characterSerializer.getFieldName(block));
-                    f.setAccessible(true);
-                    f.set(instance, f.getType().equals(char.class) ? characterSerializer.getValue(block).charValue() : characterSerializer.getValue(block));
+                        break;
+                    case CHAR:
 
-                    break;
-                case STRING:
+                        block = characterSerializer.getBlockFrom(bytes, i);
+                        f = type.getDeclaredField(characterSerializer.getFieldName(block));
+                        f.setAccessible(true);
+                        f.set(instance, f.getType().equals(char.class) ? characterSerializer.getValue(block).charValue() : characterSerializer.getValue(block));
 
-                    block = stringSerializer.getBlockFrom(bytes, i);
-                    f = type.getDeclaredField(stringSerializer.getFieldName(block));
-                    f.setAccessible(true);
-                    f.set(instance, stringSerializer.getValue(block));
+                        break;
+                    case STRING:
 
-                    break;
-                case BOOLEAN_TRUE:
+                        block = stringSerializer.getBlockFrom(bytes, i);
+                        f = type.getDeclaredField(stringSerializer.getFieldName(block));
+                        f.setAccessible(true);
+                        f.set(instance, stringSerializer.getValue(block));
 
-                    block = booleanSerializer.getBlockFrom(bytes, i);
-                    f = type.getDeclaredField(booleanSerializer.getFieldName(block));
-                    f.setAccessible(true);
-                    f.set(instance, true);
+                        break;
+                    case BOOLEAN_TRUE:
 
-                    break;
-                case BOOLEAN_FALSE:
+                        block = booleanSerializer.getBlockFrom(bytes, i);
+                        f = type.getDeclaredField(booleanSerializer.getFieldName(block));
+                        f.setAccessible(true);
+                        f.set(instance, true);
 
-                    block = booleanSerializer.getBlockFrom(bytes, i);
-                    f = type.getDeclaredField(booleanSerializer.getFieldName(block));
-                    f.setAccessible(true);
-                    f.set(instance, false);
+                        break;
+                    case BOOLEAN_FALSE:
 
-                    break;
-                case ARRAY:
+                        block = booleanSerializer.getBlockFrom(bytes, i);
+                        f = type.getDeclaredField(booleanSerializer.getFieldName(block));
+                        f.setAccessible(true);
+                        f.set(instance, false);
 
-                    block = arraySerializer.getBlockFrom(bytes, i);
-                    f = type.getDeclaredField(arraySerializer.getFieldName(block));
+                        break;
+                    case ARRAY:
 
-                    // TODO
+                        block = arraySerializer.getBlockFrom(bytes, i);
+                        f = type.getDeclaredField(arraySerializer.getFieldName(block));
+                        f.setAccessible(true);
 
-                    break;
-                case COMPLEX:
+                        /*
 
-                    byte[] nameSizeBytes = new byte[2];
-                    nameSizeBytes[0] = bytes[i + 1];
-                    nameSizeBytes[1] = bytes[i + 2];
-                    int nameSize = (int) CharSerializer.fromByteArray(nameSizeBytes);
-                    byte[] nameBytes = new byte[nameSize];
-                    for (int j = 0; j < nameBytes.length; j++)
-                        nameBytes[j] = bytes[i + 3 + j];
-                    String name = new String(nameBytes);
+                            This doesn't support (de- )serializing arrays that contain instances of
+                            classes that are not equal to declared type of the array. This means that
+                            Object[] arrays aren't supported, but also that it does not work to (de-)
+                            serialize arrays that contain instances who's superclass (or the superclasses
+                            superclass and so on) is used as the declared type of the array.
 
-                    byte[] typeSizeBytes = new byte[2];
-                    typeSizeBytes[0] = bytes[i + 3 + nameSize];
-                    typeSizeBytes[1] = bytes[i + 4 + nameSize];
-                    int typeSize = (int) CharSerializer.fromByteArray(typeSizeBytes);
-                    byte[] typeBytes = new byte[typeSize];
-                    for (int j = 0; j < typeBytes.length; j++)
-                        typeBytes[j] = bytes[i + 5 + nameSize + j];
-                    String typeName = new String(typeBytes);
+                            Anyway, the support for this might be added in the future! :D
 
-                    byte[] dataSizeBytes = new byte[2];
-                    dataSizeBytes[0] = bytes[i + 5 + nameSize + typeSize];
-                    dataSizeBytes[1] = bytes[i + 6 + nameSize + typeSize];
-                    int dataSize = (int) CharSerializer.fromByteArray(dataSizeBytes);
-                    byte[] dataBytes = new byte[dataSize];
-                    for (int j = 0; j < dataBytes.length; j++)
-                        dataBytes[j] = bytes[i + 7 + nameSize + typeSize + j];
+                         */
+
+                        f.set(instance, ArraySerializer.fromByteArray(ArraySerializer.getArrayBytes(block), f.getType(), this));
+
+                        break;
+                    case COMPLEX:
+
+                        byte[] nameSizeBytes = new byte[2];
+                        nameSizeBytes[0] = bytes[i + 1];
+                        nameSizeBytes[1] = bytes[i + 2];
+                        int nameSize = (int) CharSerializer.fromByteArray(nameSizeBytes);
+                        byte[] nameBytes = new byte[nameSize];
+                        for (int j = 0; j < nameBytes.length; j++)
+                            nameBytes[j] = bytes[i + 3 + j];
+                        String name = new String(nameBytes);
+
+                        byte[] typeSizeBytes = new byte[2];
+                        typeSizeBytes[0] = bytes[i + 3 + nameSize];
+                        typeSizeBytes[1] = bytes[i + 4 + nameSize];
+                        int typeSize = (int) CharSerializer.fromByteArray(typeSizeBytes);
+                        byte[] typeBytes = new byte[typeSize];
+                        for (int j = 0; j < typeBytes.length; j++)
+                            typeBytes[j] = bytes[i + 5 + nameSize + j];
+                        String typeName = new String(typeBytes);
+
+                        byte[] dataSizeBytes = new byte[2];
+                        dataSizeBytes[0] = bytes[i + 5 + nameSize + typeSize];
+                        dataSizeBytes[1] = bytes[i + 6 + nameSize + typeSize];
+                        int dataSize = (int) CharSerializer.fromByteArray(dataSizeBytes);
+                        byte[] dataBytes = new byte[dataSize];
+                        for (int j = 0; j < dataBytes.length; j++)
+                            dataBytes[j] = bytes[i + 7 + nameSize + typeSize + j];
 
 
-                    f = type.getDeclaredField(name);
-                    f.set(instance, deserialize(dataBytes, Class.forName(typeName)));
+                        f = type.getDeclaredField(name);
+                        f.set(instance, deserialize(dataBytes, Class.forName(typeName)));
 
-                    i += 7 + nameSize + dataSize + typeSize;
-                    break;
-                default:
-                    return null;
+                        i += 7 + nameSize + dataSize + typeSize;
+                        break;
+                    default:
+                        return null;
+                }
+                i += block.length;
             }
-            i += block.length;
+
+
+            return instance;
         }
-
-
-        return instance;
     }
 
     public FieldSerializer<Byte> getByteSerializer() {
