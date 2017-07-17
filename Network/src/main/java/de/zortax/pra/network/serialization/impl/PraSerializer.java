@@ -294,7 +294,7 @@ public class PraSerializer implements Serializer {
 
                          */
 
-                        f.set(instance, ArraySerializer.fromByteArray(ArraySerializer.getArrayBytes(block), f.getType(), this));
+                        f.set(instance, ArraySerializer.fromByteArray(ArraySerializer.getArrayBytes(block), f.getType(), this).getArray());
 
                         break;
                     case COMPLEX:

@@ -87,7 +87,7 @@ public class ArraySerializer implements FieldSerializer<ArrayContainer> {
     public byte[] getBlockFrom(byte[] allData, int index) {
         int nameSize = CharSerializer.fromByteArray(new byte[]{allData[index + 1], allData[index + 2]});
         int valueSize = CharSerializer.fromByteArray(new byte[]{allData[index + nameSize + 5], allData[index + nameSize + 6]});
-        byte[] block = new byte[nameSize + valueSize + 5];
+        byte[] block = new byte[nameSize + valueSize + 7];
         System.arraycopy(allData, index, block, 0, block.length);
         return block;
     }
@@ -177,8 +177,19 @@ public class ArraySerializer implements FieldSerializer<ArrayContainer> {
                         return new byte[0];
                 }
             }
-        } else
-            return serializer.serialize(object);
+        } else {
+            if (TypeCodes.fromClass(object.getClass()).equals(TypeCodes.COMPLEX)) {
+                int classNameLength =  object.getClass().getName().getBytes().length;
+                byte[] classNameSize = CharSerializer.toByteArray((char) classNameLength);
+                byte[] objectBytes = serializer.serialize(object);
+                byte[] bytes = new byte[classNameLength + objectBytes.length + 2];
+                bytes[0] = classNameSize[0];
+                bytes[1] = classNameSize[1];
+                System.arraycopy(object.getClass().getName().getBytes(), 0, bytes, 2, classNameLength);
+                System.arraycopy(objectBytes, 0, bytes, classNameLength + 2, bytes.length);
+                return bytes;
+            } else return serializer.serialize(object);
+        }
     }
 
     public static ArrayContainer fromByteArray(byte[] bytes, Class arrayClass, PraSerializer serializer) throws ClassNotFoundException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException {
@@ -223,7 +234,14 @@ public class ArraySerializer implements FieldSerializer<ArrayContainer> {
                 case STRING:
                     return new String(elementContainer.getBytes());
                 case COMPLEX:
-                    return serializer.deserialize(elementContainer.getBytes(), componentClass);
+                    byte[] classNameSize = new byte[]{elementContainer.getBytes()[0], elementContainer.getBytes()[1]};
+                    int classNameLength = CharSerializer.fromByteArray(classNameSize);
+                    byte[] classNameBytes = new byte[classNameLength];
+                    System.arraycopy(elementContainer.getBytes(), 2, classNameBytes, 0, classNameLength);
+                    Class<?> type = Class.forName(new String(classNameBytes));
+                    byte[] object = new byte[elementContainer.getBytes().length - classNameLength - 2];
+                    System.arraycopy(elementContainer.getBytes(), classNameLength + 2, object, 0, object.length);
+                    return serializer.deserialize(object, type);
                 default:
                     return null;
             }

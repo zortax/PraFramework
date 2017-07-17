@@ -25,9 +25,7 @@ public class PraSerializerTest {
         int t = serializer.deserialize(intBytes, int.class);
         Assert.assertEquals(intVal, t);
 
-
-
-        ComplexTest complexTest = new ComplexTest((byte) 3, true, 'c', (short) 13,42, 30001, 3.4f, 3.37d, "foo");
+        ComplexTest complexTest = new ComplexTest((byte) 3, true, 'c', (short) 13,42, 30001, 3.4f, 3.37d, new float[]{10.3f, 2f, 5.776f}, "foo");
         byte[] complexBytes = serializer.serialize(complexTest);
         ComplexTest d = serializer.deserialize(complexBytes, ComplexTest.class);
         Assert.assertEquals(complexTest, d);
@@ -43,6 +41,7 @@ public class PraSerializerTest {
         long longVal;
         float floatVal;
         double doubleVal;
+        float[] floatArray;
         String stringVal;
 
         public ComplexTest(
@@ -54,6 +53,7 @@ public class PraSerializerTest {
                 long longVal,
                 float floatVal,
                 double doubleVal,
+                float[] floatArray,
                 String stringVal) {
             this.byteVal = byteVal;
             this.booleanVal = booleanVal;
@@ -63,6 +63,7 @@ public class PraSerializerTest {
             this.longVal = longVal;
             this.floatVal = floatVal;
             this.doubleVal = doubleVal;
+            this.floatArray = floatArray;
             this.stringVal = stringVal;
         }
 
@@ -78,9 +79,20 @@ public class PraSerializerTest {
                         && longVal == t.longVal
                         && floatVal == t.floatVal
                         && doubleVal == t.doubleVal
+                        && compareArray(t.floatArray)
                         && stringVal.equals(t.stringVal);
             } else return false;
 
+        }
+
+        private boolean compareArray(float[] array) {
+            if (array.length == floatArray.length) {
+                for (int i = 0; i < array.length; i++)
+                    if (array[i] != floatArray[i])
+                        return false;
+                return true;
+            }
+            return false;
         }
 
         @Override
