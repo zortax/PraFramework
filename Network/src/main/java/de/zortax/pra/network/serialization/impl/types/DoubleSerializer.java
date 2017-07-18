@@ -21,7 +21,7 @@
 package de.zortax.pra.network.serialization.impl.types;//  Created by leo on 14.07.17.
 
 import de.zortax.pra.network.serialization.FieldSerializer;
-import de.zortax.pra.network.serialization.impl.TypeCodes;
+import de.zortax.pra.network.serialization.impl.TypeCode;
 import de.zortax.pra.network.serialization.impl.Util;
 
 import java.lang.reflect.Field;
@@ -30,7 +30,7 @@ public class DoubleSerializer implements FieldSerializer<Double> {
 
     @Override
     public byte[] toBytes(Field f, Object instance) throws IllegalAccessException {
-        return Util.toBytes(TypeCodes.DOUBLE, f.getName(), toByteArray((double) f.get(instance)));
+        return Util.toBytes(TypeCode.DOUBLE, f.getName(), toByteArray((double) f.get(instance)));
     }
 
     @Override

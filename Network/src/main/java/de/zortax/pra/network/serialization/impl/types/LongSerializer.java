@@ -1,7 +1,7 @@
 package de.zortax.pra.network.serialization.impl.types;// Created by leo on 13.07.17
 
 import de.zortax.pra.network.serialization.FieldSerializer;
-import de.zortax.pra.network.serialization.impl.TypeCodes;
+import de.zortax.pra.network.serialization.impl.TypeCode;
 import de.zortax.pra.network.serialization.impl.Util;
 
 import java.lang.reflect.Field;
@@ -10,7 +10,7 @@ public class LongSerializer implements FieldSerializer<Long> {
 
     @Override
     public byte[] toBytes(Field f, Object instance) throws IllegalAccessException {
-        return Util.toBytes(TypeCodes.LONG, f.getName(), toByteArray((long) f.get(instance)));
+        return Util.toBytes(TypeCode.LONG, f.getName(), toByteArray((long) f.get(instance)));
     }
 
     @Override

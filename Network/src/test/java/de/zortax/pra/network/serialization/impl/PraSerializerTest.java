@@ -29,6 +29,18 @@ public class PraSerializerTest {
         byte[] complexBytes = serializer.serialize(complexTest);
         ComplexTest d = serializer.deserialize(complexBytes, ComplexTest.class);
         Assert.assertEquals(complexTest, d);
+
+        ComplexTest complexTest2 = new ComplexTest((byte) 1, false, 'k', (short) 21, 7, 99999, 1.2f, 77.998d, new float[]{19,4f, 7.009f, 4.5f}, "bar");
+        ComplexTest[][] complexArrayTest = new ComplexTest[][]{{complexTest, d}, {complexTest2}};
+        byte[] complexArrayBytes = serializer.serialize(complexArrayTest);
+        ComplexTest[][] dArray = serializer.deserialize(complexArrayBytes, ComplexTest[][].class);
+        Assert.assertEquals(complexArrayTest.length, dArray.length);
+        for (int i = 0; i < dArray.length; i++) {
+            Assert.assertEquals(complexArrayTest[i].length, dArray[i].length);
+            for (int j = 0; j < dArray[i].length; j++)
+                Assert.assertEquals(complexArrayTest[i][j], dArray[i][j]);
+        }
+
     }
 
     public static class ComplexTest {

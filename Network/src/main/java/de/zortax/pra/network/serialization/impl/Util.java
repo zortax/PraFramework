@@ -34,7 +34,7 @@ public class Util {
         return new String(name);
     }
 
-    public static byte[] toBytes(TypeCodes typeCode, String name, byte[] value) {
+    public static byte[] toBytes(TypeCode typeCode, String name, byte[] value) {
         byte[] nameBytes = name.getBytes();
         byte[] bytes = new byte[nameBytes.length + value.length + 3];
         bytes[0] = typeCode.getCode();

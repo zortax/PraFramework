@@ -21,18 +21,17 @@
 package de.zortax.pra.network.serialization.impl.types;// Created by Leonard on 09.07.2017
 
 import de.zortax.pra.network.serialization.FieldSerializer;
-import de.zortax.pra.network.serialization.impl.TypeCodes;
+import de.zortax.pra.network.serialization.impl.TypeCode;
 import de.zortax.pra.network.serialization.impl.Util;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 
 public class IntegerSerializer implements FieldSerializer<Integer> {
 
     @Override
     public byte[] toBytes(Field f, Object instance) throws IllegalAccessException {
         byte[] bytes = toByteArray((int) f.get(instance));
-        return Util.toBytes(TypeCodes.INT, f.getName(), bytes);
+        return Util.toBytes(TypeCode.INT, f.getName(), bytes);
     }
 
     @Override

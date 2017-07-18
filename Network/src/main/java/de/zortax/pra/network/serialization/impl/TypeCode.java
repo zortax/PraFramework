@@ -20,7 +20,7 @@
 
 package de.zortax.pra.network.serialization.impl;// Created by leo on 24.06.17
 
-public enum TypeCodes {
+public enum TypeCode {
 
     BYTE((byte) 1),
     SHORT((byte) 2),
@@ -37,7 +37,7 @@ public enum TypeCodes {
 
     private byte code;
 
-    TypeCodes(byte code) {
+    TypeCode(byte code) {
         this.code = code;
     }
 
@@ -45,7 +45,7 @@ public enum TypeCodes {
         return code;
     }
 
-    public static TypeCodes fromCode(byte code) {
+    public static TypeCode fromCode(byte code) {
         switch (code) {
             case (byte) 1:
                 return BYTE;
@@ -74,7 +74,7 @@ public enum TypeCodes {
         }
     }
 
-    public static TypeCodes fromClass(Class clazz) {
+    public static TypeCode fromClass(Class clazz) {
         if (clazz.isArray())
             return ARRAY;
         else if (clazz.equals(byte.class) || clazz.equals(Byte.class))

@@ -74,7 +74,7 @@ public class PraSerializer implements Serializer {
         if (obj.getClass().equals(byte.class) || obj instanceof Byte)
             return new byte[]{(byte) obj};
         else if (obj.getClass().equals(boolean.class) || obj instanceof Boolean)
-            return (boolean) obj ? new byte[]{TypeCodes.BOOLEAN_TRUE.getCode()} : new byte[]{TypeCodes.BOOLEAN_FALSE.getCode()};
+            return (boolean) obj ? new byte[]{TypeCode.BOOLEAN_TRUE.getCode()} : new byte[]{TypeCode.BOOLEAN_FALSE.getCode()};
         else if (obj.getClass().equals(char.class) || obj instanceof Character)
             return CharSerializer.toByteArray((char) obj);
         else if (obj.getClass().equals(short.class) || obj instanceof Short)
@@ -136,7 +136,7 @@ public class PraSerializer implements Serializer {
                         byte[] type = f.get(obj).getClass().getName().getBytes();
                         byte[] typeSize = CharSerializer.toByteArray((char) type.length);
 
-                        allBytes.add(TypeCodes.COMPLEX.getCode());
+                        allBytes.add(TypeCode.COMPLEX.getCode());
 
                         for (byte b : nameSize)
                             allBytes.add(b);
@@ -170,7 +170,7 @@ public class PraSerializer implements Serializer {
         if (type.equals(byte.class) || type.equals(Byte.class))
             return (T) new Byte(bytes[0]);
         else if (type.equals(boolean.class) || type.equals(Boolean.class))
-            return (T) (TypeCodes.fromCode(bytes[0]).equals(TypeCodes.BOOLEAN_TRUE) ? Boolean.TRUE : Boolean.FALSE);
+            return (T) (TypeCode.fromCode(bytes[0]).equals(TypeCode.BOOLEAN_TRUE) ? Boolean.TRUE : Boolean.FALSE);
         else if (type.equals(char.class) || type.equals(Character.class))
             return (T) new Character(CharSerializer.fromByteArray(bytes));
         else if (type.equals(short.class) || type.equals(Short.class))
@@ -195,7 +195,7 @@ public class PraSerializer implements Serializer {
                 byte[] block = new byte[0];
                 Field f;
 
-                switch (TypeCodes.fromCode(bytes[i])) {
+                switch (TypeCode.fromCode(bytes[i])) {
                     case BYTE:
 
                         block = byteSerializer.getBlockFrom(bytes, i);
@@ -281,19 +281,6 @@ public class PraSerializer implements Serializer {
                         block = arraySerializer.getBlockFrom(bytes, i);
                         f = type.getDeclaredField(arraySerializer.getFieldName(block));
                         f.setAccessible(true);
-
-                        /*
-
-                            This doesn't support (de- )serializing arrays that contain instances of
-                            classes that are not equal to declared type of the array. This means that
-                            Object[] arrays aren't supported, but also that it does not work to (de-)
-                            serialize arrays that contain instances who's superclass (or the superclasses
-                            superclass and so on) is used as the declared type of the array.
-
-                            Anyway, the support for this might be added in the future! :D
-
-                         */
-
                         f.set(instance, ArraySerializer.fromByteArray(ArraySerializer.getArrayBytes(block), f.getType(), this).getArray());
 
                         break;

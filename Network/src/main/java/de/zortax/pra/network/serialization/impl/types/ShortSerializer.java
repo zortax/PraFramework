@@ -21,7 +21,7 @@
 package de.zortax.pra.network.serialization.impl.types;//  Created by leo on 12.07.17.
 
 import de.zortax.pra.network.serialization.FieldSerializer;
-import de.zortax.pra.network.serialization.impl.TypeCodes;
+import de.zortax.pra.network.serialization.impl.TypeCode;
 import de.zortax.pra.network.serialization.impl.Util;
 
 import java.lang.reflect.Field;
@@ -30,7 +30,7 @@ public class ShortSerializer implements FieldSerializer<Short> {
 
     @Override
     public byte[] toBytes(Field f, Object instance) throws IllegalAccessException {
-        return Util.toBytes(TypeCodes.SHORT, f.getName(), toByteArray((short) f.get(instance)));
+        return Util.toBytes(TypeCode.SHORT, f.getName(), toByteArray((short) f.get(instance)));
     }
 
     @Override

@@ -23,7 +23,7 @@ package de.zortax.pra.network.serialization.impl.types;// Created by leo on 14.0
 import de.zortax.pra.network.serialization.FieldSerializer;
 import de.zortax.pra.network.serialization.impl.ArrayContainer;
 import de.zortax.pra.network.serialization.impl.PraSerializer;
-import de.zortax.pra.network.serialization.impl.TypeCodes;
+import de.zortax.pra.network.serialization.impl.TypeCode;
 import de.zortax.pra.network.serialization.impl.Util;
 
 import java.lang.reflect.Array;
@@ -45,7 +45,7 @@ public class ArraySerializer implements FieldSerializer<ArrayContainer> {
         ArrayContainer container = new ArrayContainer(array);
 
         ArrayList<Byte> allBytes = new ArrayList<>();
-        allBytes.add(TypeCodes.ARRAY.getCode());
+        allBytes.add(TypeCode.ARRAY.getCode());
 
         byte[] nameSize = CharSerializer.toByteArray((char) f.getName().getBytes().length);
         allBytes.add(nameSize[0]);
@@ -58,7 +58,7 @@ public class ArraySerializer implements FieldSerializer<ArrayContainer> {
         Class elementType = array.getClass().getComponentType();
         for (int i = 0; i < dimensions - 1; i++)
             elementType = elementType.getComponentType();
-        allBytes.add(TypeCodes.fromClass(elementType).getCode());
+        allBytes.add(TypeCode.fromClass(elementType).getCode());
 
         byte[] arrayBytes = toByteArray(array, praSerializer);
         byte[] valueSize = CharSerializer.toByteArray((char) arrayBytes.length);
@@ -92,8 +92,8 @@ public class ArraySerializer implements FieldSerializer<ArrayContainer> {
         return block;
     }
 
-    public static TypeCodes getComponentType(byte[] block) {
-        return TypeCodes.fromCode(block[CharSerializer.fromByteArray(new byte[]{block[1], block[2]}) + 4]);
+    public static TypeCode getComponentType(byte[] block) {
+        return TypeCode.fromCode(block[CharSerializer.fromByteArray(new byte[]{block[1], block[2]}) + 4]);
     }
 
     public static byte[] getArrayBytes(byte[] block) {
@@ -112,8 +112,8 @@ public class ArraySerializer implements FieldSerializer<ArrayContainer> {
                 for (Object c : array) {
                     byte[] elementBytes = toByteArray(c, serializer);
                     if (c.getClass().isArray()
-                            || TypeCodes.fromClass(c.getClass()).equals(TypeCodes.COMPLEX)
-                            || TypeCodes.fromClass(c.getClass()).equals(TypeCodes.STRING)) {
+                            || TypeCode.fromClass(c.getClass()).equals(TypeCode.COMPLEX)
+                            || TypeCode.fromClass(c.getClass()).equals(TypeCode.STRING)) {
                         byte[] elementSize = CharSerializer.toByteArray((char) elementBytes.length);
                         bytes.add(elementSize[0]);
                         bytes.add(elementSize[1]);
@@ -126,7 +126,7 @@ public class ArraySerializer implements FieldSerializer<ArrayContainer> {
                     allBytes[i] = bytes.get(i);
                 return allBytes;
             } else {
-                TypeCodes type = TypeCodes.fromClass(object.getClass().getComponentType());
+                TypeCode type = TypeCode.fromClass(object.getClass().getComponentType());
                 byte[] bytes;
                 switch (type) {
                     case BYTE:
@@ -135,7 +135,7 @@ public class ArraySerializer implements FieldSerializer<ArrayContainer> {
                         boolean[] bools = (boolean[]) object;
                         bytes = new byte[bools.length];
                         for (int i = 0; i < bools.length; i++)
-                            bytes[i] = bools[i] ? TypeCodes.BOOLEAN_TRUE.getCode() : TypeCodes.BOOLEAN_FALSE.getCode();
+                            bytes[i] = bools[i] ? TypeCode.BOOLEAN_TRUE.getCode() : TypeCode.BOOLEAN_FALSE.getCode();
                         return bytes;
                     case SHORT:
                         short[] shorts = (short[]) object;
@@ -178,7 +178,7 @@ public class ArraySerializer implements FieldSerializer<ArrayContainer> {
                 }
             }
         } else {
-            if (TypeCodes.fromClass(object.getClass()).equals(TypeCodes.COMPLEX)) {
+            if (TypeCode.fromClass(object.getClass()).equals(TypeCode.COMPLEX)) {
                 int classNameLength =  object.getClass().getName().getBytes().length;
                 byte[] classNameSize = CharSerializer.toByteArray((char) classNameLength);
                 byte[] objectBytes = serializer.serialize(object);
@@ -186,7 +186,7 @@ public class ArraySerializer implements FieldSerializer<ArrayContainer> {
                 bytes[0] = classNameSize[0];
                 bytes[1] = classNameSize[1];
                 System.arraycopy(object.getClass().getName().getBytes(), 0, bytes, 2, classNameLength);
-                System.arraycopy(objectBytes, 0, bytes, classNameLength + 2, bytes.length);
+                System.arraycopy(objectBytes, 0, bytes, classNameLength + 2, objectBytes.length);
                 return bytes;
             } else return serializer.serialize(object);
         }
@@ -197,7 +197,7 @@ public class ArraySerializer implements FieldSerializer<ArrayContainer> {
     }
 
     public static ArrayContainer fromByteArray(byte[] bytes, Class arrayClass, Class componentClass, int dimension, PraSerializer serializer) throws ClassNotFoundException, NoSuchFieldException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        ArrayList<ElementContainer> elements = getElements(bytes, TypeCodes.fromClass(componentClass), dimension);
+        ArrayList<ElementContainer> elements = getElements(bytes, TypeCode.fromClass(componentClass), dimension);
         Object array = Array.newInstance(arrayClass.getComponentType(), elements.size());
 
         for (int i = 0; i < elements.size(); i++)
@@ -214,11 +214,11 @@ public class ArraySerializer implements FieldSerializer<ArrayContainer> {
                 Array.set(array, i, getElement(elementContainer.getElements().get(i), componentClass.getComponentType(), serializer));
             return array;
         } else {
-            switch (TypeCodes.fromClass(componentClass)) {
+            switch (TypeCode.fromClass(componentClass)) {
                 case BYTE:
                     return elementContainer.getBytes()[0];
                 case BOOLEAN_TRUE:
-                    return elementContainer.getBytes()[0] == TypeCodes.BOOLEAN_TRUE.getCode();
+                    return elementContainer.getBytes()[0] == TypeCode.BOOLEAN_TRUE.getCode();
                 case CHAR:
                     return CharSerializer.fromByteArray(elementContainer.getBytes());
                 case SHORT:
@@ -249,9 +249,9 @@ public class ArraySerializer implements FieldSerializer<ArrayContainer> {
 
     }
 
-    private static ArrayList<ElementContainer> getElements(byte[] bytes, TypeCodes componentType, int dimension) {
+    private static ArrayList<ElementContainer> getElements(byte[] bytes, TypeCode componentType, int dimension) {
         ArrayList<ElementContainer> elements = new ArrayList<>();
-        if (0 < dimension - 1 || componentType.equals(TypeCodes.STRING) || componentType.equals(TypeCodes.COMPLEX)) {
+        if (0 < dimension - 1 || componentType.equals(TypeCode.STRING) || componentType.equals(TypeCode.COMPLEX)) {
             for (int j = 0; j < bytes.length; j++) {
                 int size = CharSerializer.fromByteArray(new byte[]{bytes[j], bytes[j + 1]});
                 byte[] element = new byte[size];
@@ -262,16 +262,16 @@ public class ArraySerializer implements FieldSerializer<ArrayContainer> {
                     elements.add(new ElementContainer(element));
                 j += size + 1;
             }
-        } else if (componentType.equals(TypeCodes.BYTE) || componentType.equals(TypeCodes.BOOLEAN_TRUE))
+        } else if (componentType.equals(TypeCode.BYTE) || componentType.equals(TypeCode.BOOLEAN_TRUE))
             for (byte b : bytes)
                 elements.add(new ElementContainer(new byte[]{b}));
-        else if (componentType.equals(TypeCodes.CHAR) || componentType.equals(TypeCodes.SHORT))
+        else if (componentType.equals(TypeCode.CHAR) || componentType.equals(TypeCode.SHORT))
             for (int j = 0; j + 1 < bytes.length; j += 2)
                 elements.add(new ElementContainer(new byte[]{bytes[j], bytes[j + 1]}));
-        else if (componentType.equals(TypeCodes.INT) || componentType.equals(TypeCodes.FLOAT))
+        else if (componentType.equals(TypeCode.INT) || componentType.equals(TypeCode.FLOAT))
             for (int j = 0; j + 3 < bytes.length; j += 4)
                 elements.add(new ElementContainer(new byte[]{bytes[j], bytes[j + 1], bytes[j + 2], bytes[j + 3]}));
-        else if (componentType.equals(TypeCodes.LONG) || componentType.equals(TypeCodes.DOUBLE))
+        else if (componentType.equals(TypeCode.LONG) || componentType.equals(TypeCode.DOUBLE))
             for (int j = 0; j + 7 < bytes.length;j += 8)
                 elements.add(new ElementContainer(new byte[]{
                         bytes[j],

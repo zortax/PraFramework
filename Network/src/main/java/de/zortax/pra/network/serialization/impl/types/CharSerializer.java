@@ -21,7 +21,7 @@
 package de.zortax.pra.network.serialization.impl.types;// Created by leo on 24.06.17
 
 import de.zortax.pra.network.serialization.FieldSerializer;
-import de.zortax.pra.network.serialization.impl.TypeCodes;
+import de.zortax.pra.network.serialization.impl.TypeCode;
 import de.zortax.pra.network.serialization.impl.Util;
 
 import java.lang.reflect.Field;
@@ -31,7 +31,7 @@ public class CharSerializer implements FieldSerializer<Character> {
     @Override
     public byte[] toBytes(Field f, Object instance) throws IllegalAccessException {
         byte[] valueBytes = toByteArray((char) f.get(instance));
-        return Util.toBytes(TypeCodes.CHAR, f.getName(), valueBytes);
+        return Util.toBytes(TypeCode.CHAR, f.getName(), valueBytes);
     }
 
     @Override
