@@ -50,6 +50,25 @@ public class PraSerializerTest {
         // check inherited fields
         Assert.assertEquals(handshakePacket.getRequestID(), deserialize.getRequestID());
 
+        GenericTest<String> test = new GenericTest<>("n00b");
+        byte[] genericBytes = serializer.serialize(test);
+        GenericTest<String> deserialized = serializer.deserialize(genericBytes, GenericTest.class);
+        Assert.assertEquals(test.getVar(), deserialized.getVar());
+
+    }
+
+    public static class GenericTest<T> {
+
+        T var;
+
+        public GenericTest(T var) {
+            this.var = var;
+        }
+
+        public T getVar() {
+            return var;
+        }
+
     }
 
     public static class ComplexTest {
