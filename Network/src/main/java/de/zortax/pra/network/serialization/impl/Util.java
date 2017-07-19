@@ -22,6 +22,11 @@ package de.zortax.pra.network.serialization.impl;//  Created by leo on 12.07.17.
 
 import de.zortax.pra.network.serialization.impl.types.CharSerializer;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
 public class Util {
 
     public static String getFieldName(byte[] bytes) {
@@ -83,6 +88,28 @@ public class Util {
         while (componentType.isArray())
             componentType = componentType.getComponentType();
         return componentType;
+    }
+
+    public static ArrayList<Field> getAllFields(Class clazz) {
+        ArrayList<Field> fields = new ArrayList<>();
+        fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
+        while (clazz.getSuperclass() != Object.class) {
+            clazz = clazz.getSuperclass();
+            fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
+        }
+        return fields;
+    }
+
+    public static HashMap<String, Field> getAllFieldsMapped(Class clazz) {
+        HashMap<String, Field> fields = new HashMap<>();
+        for (Field f : clazz.getDeclaredFields())
+            fields.put(f.getName(), f);
+        while (clazz.getSuperclass() != Object.class) {
+            clazz = clazz.getSuperclass();
+            for (Field f : clazz.getDeclaredFields())
+                fields.put(f.getName(), f);
+        }
+        return fields;
     }
 
 }

@@ -29,6 +29,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class PraSerializer implements Serializer {
 
@@ -95,7 +96,7 @@ public class PraSerializer implements Serializer {
 
             ArrayList<Byte> allBytes = new ArrayList<>();
 
-            for (Field f : obj.getClass().getDeclaredFields()) {
+            for (Field f : Util.getAllFields(obj.getClass())) {
                 if (!Modifier.isStatic(f.getModifiers()) && !Modifier.isTransient(f.getModifiers())) {
                     f.setAccessible(true);
                     if (f.getType().isArray()) {
@@ -193,13 +194,14 @@ public class PraSerializer implements Serializer {
 
             for (int i = 0; i < bytes.length; ) {
                 byte[] block = new byte[0];
+                HashMap<String, Field> allFields = Util.getAllFieldsMapped(type);
                 Field f;
 
                 switch (TypeCode.fromCode(bytes[i])) {
                     case BYTE:
 
                         block = byteSerializer.getBlockFrom(bytes, i);
-                        f = type.getDeclaredField(byteSerializer.getFieldName(block));
+                        f = allFields.get(byteSerializer.getFieldName(block));
                         f.setAccessible(true);
                         f.set(instance, f.getType().equals(byte.class) ? byteSerializer.getValue(block).byteValue() : byteSerializer.getValue(block));
 
@@ -207,7 +209,7 @@ public class PraSerializer implements Serializer {
                     case SHORT:
 
                         block = shortSerializer.getBlockFrom(bytes, i);
-                        f = type.getDeclaredField(shortSerializer.getFieldName(block));
+                        f = allFields.get(shortSerializer.getFieldName(block));
                         f.setAccessible(true);
                         f.set(instance, f.getType().equals(short.class) ? shortSerializer.getValue(block).shortValue() : shortSerializer.getValue(block));
 
@@ -215,7 +217,7 @@ public class PraSerializer implements Serializer {
                     case INT:
 
                         block = integerSerializer.getBlockFrom(bytes, i);
-                        f = type.getDeclaredField(shortSerializer.getFieldName(block));
+                        f = allFields.get(shortSerializer.getFieldName(block));
                         f.setAccessible(true);
                         f.set(instance, f.getType().equals(int.class) ? integerSerializer.getValue(block).intValue() : integerSerializer.getValue(block));
 
@@ -223,7 +225,7 @@ public class PraSerializer implements Serializer {
                     case LONG:
 
                         block = longSerializer.getBlockFrom(bytes, i);
-                        f = type.getDeclaredField(longSerializer.getFieldName(block));
+                        f = allFields.get(longSerializer.getFieldName(block));
                         f.setAccessible(true);
                         f.set(instance, f.getType().equals(long.class) ? longSerializer.getValue(block).longValue() : longSerializer.getValue(block));
 
@@ -231,7 +233,7 @@ public class PraSerializer implements Serializer {
                     case FLOAT:
 
                         block = floatSerializer.getBlockFrom(bytes, i);
-                        f = type.getDeclaredField(floatSerializer.getFieldName(block));
+                        f = allFields.get(floatSerializer.getFieldName(block));
                         f.setAccessible(true);
                         f.set(instance, f.getType().equals(float.class) ? floatSerializer.getValue(block).floatValue() : floatSerializer.getValue(block));
 
@@ -239,7 +241,7 @@ public class PraSerializer implements Serializer {
                     case DOUBLE:
 
                         block = doubleSerializer.getBlockFrom(bytes, i);
-                        f = type.getDeclaredField(doubleSerializer.getFieldName(block));
+                        f = allFields.get(doubleSerializer.getFieldName(block));
                         f.setAccessible(true);
                         f.set(instance, f.getType().equals(double.class) ? doubleSerializer.getValue(block).doubleValue() : doubleSerializer.getValue(block));
 
@@ -247,7 +249,7 @@ public class PraSerializer implements Serializer {
                     case CHAR:
 
                         block = characterSerializer.getBlockFrom(bytes, i);
-                        f = type.getDeclaredField(characterSerializer.getFieldName(block));
+                        f = allFields.get(characterSerializer.getFieldName(block));
                         f.setAccessible(true);
                         f.set(instance, f.getType().equals(char.class) ? characterSerializer.getValue(block).charValue() : characterSerializer.getValue(block));
 
@@ -255,7 +257,7 @@ public class PraSerializer implements Serializer {
                     case STRING:
 
                         block = stringSerializer.getBlockFrom(bytes, i);
-                        f = type.getDeclaredField(stringSerializer.getFieldName(block));
+                        f = allFields.get(stringSerializer.getFieldName(block));
                         f.setAccessible(true);
                         f.set(instance, stringSerializer.getValue(block));
 
@@ -263,7 +265,7 @@ public class PraSerializer implements Serializer {
                     case BOOLEAN_TRUE:
 
                         block = booleanSerializer.getBlockFrom(bytes, i);
-                        f = type.getDeclaredField(booleanSerializer.getFieldName(block));
+                        f = allFields.get(booleanSerializer.getFieldName(block));
                         f.setAccessible(true);
                         f.set(instance, true);
 
@@ -271,7 +273,7 @@ public class PraSerializer implements Serializer {
                     case BOOLEAN_FALSE:
 
                         block = booleanSerializer.getBlockFrom(bytes, i);
-                        f = type.getDeclaredField(booleanSerializer.getFieldName(block));
+                        f = allFields.get(booleanSerializer.getFieldName(block));
                         f.setAccessible(true);
                         f.set(instance, false);
 
@@ -279,7 +281,7 @@ public class PraSerializer implements Serializer {
                     case ARRAY:
 
                         block = arraySerializer.getBlockFrom(bytes, i);
-                        f = type.getDeclaredField(arraySerializer.getFieldName(block));
+                        f = allFields.get(arraySerializer.getFieldName(block));
                         f.setAccessible(true);
                         f.set(instance, ArraySerializer.fromByteArray(ArraySerializer.getArrayBytes(block), f.getType(), this).getArray());
 
@@ -313,7 +315,7 @@ public class PraSerializer implements Serializer {
                             dataBytes[j] = bytes[i + 7 + nameSize + typeSize + j];
 
 
-                        f = type.getDeclaredField(name);
+                        f = allFields.get(name);
                         f.set(instance, deserialize(dataBytes, Class.forName(typeName)));
 
                         i += 7 + nameSize + dataSize + typeSize;

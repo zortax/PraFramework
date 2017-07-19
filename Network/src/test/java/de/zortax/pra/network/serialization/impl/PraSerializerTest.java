@@ -1,5 +1,6 @@
 package de.zortax.pra.network.serialization.impl;
 
+import de.zortax.pra.network.packets.HandshakePacket;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -40,6 +41,14 @@ public class PraSerializerTest {
             for (int j = 0; j < dArray[i].length; j++)
                 Assert.assertEquals(complexArrayTest[i][j], dArray[i][j]);
         }
+
+        HandshakePacket handshakePacket = new HandshakePacket("test_name", "test_version", "test_version2");
+        handshakePacket.setRequestFlag(true);
+        handshakePacket.setRequestID("foo_bar_blub");
+        byte[] data = serializer.serialize(handshakePacket);
+        HandshakePacket deserialize = serializer.deserialize(data, HandshakePacket.class);
+        // check inherited fields
+        Assert.assertEquals(handshakePacket.getRequestID(), deserialize.getRequestID());
 
     }
 
