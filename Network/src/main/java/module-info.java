@@ -1,6 +1,6 @@
 // Created by leo on 26.09.17
 module PraNetwork {
-    requires gson;
+    requires com.google.gson;
     exports de.zortax.pra.network;
     exports de.zortax.pra.network.api;
     exports de.zortax.pra.network.config;
