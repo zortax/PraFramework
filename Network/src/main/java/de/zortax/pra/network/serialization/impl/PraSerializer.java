@@ -30,6 +30,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class PraSerializer implements Serializer {
 
@@ -97,7 +98,7 @@ public class PraSerializer implements Serializer {
             ArrayList<Byte> allBytes = new ArrayList<>();
 
             for (Field f : Util.getAllFields(obj.getClass())) {
-                if (!Modifier.isStatic(f.getModifiers()) && !Modifier.isTransient(f.getModifiers())) {
+                if (!Modifier.isStatic(f.getModifiers()) && (!Modifier.isTransient(f.getModifiers()) || List.class.isAssignableFrom(obj.getClass()))) {
                     f.setAccessible(true);
                     if (f.getType().isArray()) {
                         for (byte b : arraySerializer.toBytes(f, obj))

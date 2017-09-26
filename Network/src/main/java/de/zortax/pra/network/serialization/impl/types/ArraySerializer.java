@@ -105,21 +105,29 @@ public class ArraySerializer implements FieldSerializer<ArrayContainer> {
     }
 
     public static byte[] toByteArray(Object object, PraSerializer serializer) throws IllegalAccessException {
+        if (object == null)
+            return new byte[0];
         if (object.getClass().isArray()) {
             if (object instanceof Object[]) {
                 ArrayList<Byte> bytes = new ArrayList<>();
                 Object[] array = (Object[]) object;
-                for (Object c : array) {
-                    byte[] elementBytes = toByteArray(c, serializer);
-                    if (c.getClass().isArray()
-                            || TypeCode.fromClass(c.getClass()).equals(TypeCode.COMPLEX)
-                            || TypeCode.fromClass(c.getClass()).equals(TypeCode.STRING)) {
-                        byte[] elementSize = CharSerializer.toByteArray((char) elementBytes.length);
-                        bytes.add(elementSize[0]);
-                        bytes.add(elementSize[1]);
+                for (int i = 0; i < array.length; i++) {
+                    Object c = array[i];
+                    if (c != null) {
+                        byte[] index = CharSerializer.toByteArray((char) i);
+                        bytes.add(index[0]);
+                        bytes.add(index[1]);
+                        byte[] elementBytes = toByteArray(c, serializer);
+                        if (c.getClass().isArray()
+                                || TypeCode.fromClass(c.getClass()).equals(TypeCode.COMPLEX)
+                                || TypeCode.fromClass(c.getClass()).equals(TypeCode.STRING)) {
+                            byte[] elementSize = CharSerializer.toByteArray((char) elementBytes.length);
+                            bytes.add(elementSize[0]);
+                            bytes.add(elementSize[1]);
+                        }
+                        for (byte b : elementBytes)
+                            bytes.add(b);
                     }
-                    for (byte b : elementBytes)
-                        bytes.add(b);
                 }
                 byte[] allBytes = new byte[bytes.size()];
                 for (int i = 0; i < allBytes.length; i++)

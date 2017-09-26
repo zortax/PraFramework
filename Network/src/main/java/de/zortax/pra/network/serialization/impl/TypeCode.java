@@ -33,7 +33,8 @@ public enum TypeCode {
     BOOLEAN_TRUE((byte) 9),
     BOOLEAN_FALSE((byte) 10),
     ARRAY((byte) 11),
-    COMPLEX((byte) 12);
+    COMPLEX((byte) 12),
+    NULL((byte) 13);
 
     private byte code;
 
@@ -69,8 +70,10 @@ public enum TypeCode {
                 return BOOLEAN_FALSE;
             case (byte) 11:
                 return ARRAY;
-            default:
+            case (byte) 12:
                 return COMPLEX;
+            default:
+                return NULL;
         }
     }
 

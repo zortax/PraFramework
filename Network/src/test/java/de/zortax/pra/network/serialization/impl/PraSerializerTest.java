@@ -5,6 +5,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 // Created by leo on 16.07.17
 public class PraSerializerTest {
@@ -54,6 +56,21 @@ public class PraSerializerTest {
         byte[] genericBytes = serializer.serialize(test);
         GenericTest<String> deserialized = serializer.deserialize(genericBytes, GenericTest.class);
         Assert.assertEquals(test.getVar(), deserialized.getVar());
+
+        ArrayList<String> list = new ArrayList<>();
+        list.add("foo");
+        list.add("bar");
+        byte[] listBytes = serializer.serialize(list);
+        ArrayList<String> desList = serializer.deserialize(listBytes, ArrayList.class);
+        Assert.assertNotNull(desList);
+        Assert.assertEquals(list, desList);
+
+        HashMap<String, String> map = new HashMap<>();
+        map.put("foo", "bar");
+        map.put("7", "42");
+        byte[] mapBytes = serializer.serialize(map);
+        HashMap<String, String> deserializedMap = serializer.deserialize(mapBytes, HashMap.class);
+        Assert.assertEquals(map, deserializedMap);
 
     }
 
