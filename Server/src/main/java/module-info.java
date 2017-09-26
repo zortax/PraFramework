@@ -2,6 +2,7 @@
 module PraServer {
     requires PraNetwork;
     requires gson;
+    requires java.logging;
     exports de.zortax.pra.server;
     exports de.zortax.pra.server.config;
     exports de.zortax.pra.server.events;
