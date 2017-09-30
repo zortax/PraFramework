@@ -7,7 +7,7 @@ import org.junit.Test;
 // Created by leo on 16.07.17
 public class ArraySerializerTest {
 
-   /* @Test
+    @Test
     public void toByteArray() throws Exception {
 
         PraSerializer serializer = new PraSerializer();
@@ -34,6 +34,6 @@ public class ArraySerializerTest {
         int[][] deserializedIntInts = ArraySerializer.fromByteArray(intIntBytes, int[][].class, serializer).getArray(int[][].class);
         for (int i = 0; i < intIntArray.length; i++)
             Assert.assertArrayEquals(intIntArray[i], deserializedIntInts[i]);
-    }*/
+    }
 
 }
