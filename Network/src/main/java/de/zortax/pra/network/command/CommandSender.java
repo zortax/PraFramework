@@ -1,4 +1,4 @@
-package de.zortax.pra.server.command;//  Created by Leo on 28.04.2017.
+package de.zortax.pra.network.command;//  Created by Leo on 28.04.2017.
 
 import java.util.logging.Level;
 

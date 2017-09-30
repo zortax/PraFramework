@@ -18,7 +18,7 @@
 
  */
 
-package de.zortax.pra.server.command;//  Created by Leonard on 03.03.2017.
+package de.zortax.pra.network.command;//  Created by Leonard on 03.03.2017.
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -33,6 +33,11 @@ public @interface PraCommand {
      * @return The name of this command
      */
     String name();
+
+    /**
+     * @return Aliases of this command
+     */
+    String[] aliases() default {};
 
     /**
      * @return short usage instructions

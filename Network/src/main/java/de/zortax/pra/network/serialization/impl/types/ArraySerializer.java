@@ -45,27 +45,30 @@ public class ArraySerializer implements FieldSerializer<ArrayContainer> {
         ArrayContainer container = new ArrayContainer(array);
 
         ArrayList<Byte> allBytes = new ArrayList<>();
-        allBytes.add(TypeCode.ARRAY.getCode());
+        allBytes.add(TypeCode.ARRAY.getCode()); // Byte 1: Code
 
         byte[] nameSize = CharSerializer.toByteArray((char) f.getName().getBytes().length);
-        allBytes.add(nameSize[0]);
-        allBytes.add(nameSize[1]);
-        for (byte b : f.getName().getBytes())
+        allBytes.add(nameSize[0]); // Byte 2: Name Size
+        allBytes.add(nameSize[1]); // Byte 3: Name Size
+        for (byte b : f.getName().getBytes()) // Name bytes
             allBytes.add(b);
 
         int dimensions = container.getDimensions();
-        allBytes.add((byte) dimensions);
+        allBytes.add((byte) dimensions); // Byte 4 + name size: dimensions
+        byte[] size = CharSerializer.toByteArray((char) Array.getLength(array));
+        allBytes.add(size[0]); // Byte 5 + name size: array size
+        allBytes.add(size[1]); // Byte 6 + name size: array size
         Class elementType = array.getClass().getComponentType();
         for (int i = 0; i < dimensions - 1; i++)
             elementType = elementType.getComponentType();
-        allBytes.add(TypeCode.fromClass(elementType).getCode());
+        allBytes.add(TypeCode.fromClass(elementType).getCode()); // Byte 7 + name size: component type code
 
         byte[] arrayBytes = toByteArray(array, praSerializer);
         byte[] valueSize = CharSerializer.toByteArray((char) arrayBytes.length);
         for (byte b : valueSize)
-            allBytes.add(b);
+            allBytes.add(b); // array serial size
         for (byte b : toByteArray(array, praSerializer))
-            allBytes.add(b);
+            allBytes.add(b); // array bytes
 
         byte[] bytes = new byte[allBytes.size()];
         for (int i = 0; i < bytes.length; i++)

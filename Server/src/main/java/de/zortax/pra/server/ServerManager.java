@@ -20,8 +20,9 @@
 
 package de.zortax.pra.server;//  Created by Leonard on 03.03.2017.
 
+import de.zortax.pra.network.error.ExceptionHandler;
 import de.zortax.pra.network.event.EventManager;
-import de.zortax.pra.server.command.CommandManager;
+import de.zortax.pra.network.command.CommandManager;
 import de.zortax.pra.server.net.PraServer;
 import de.zortax.pra.server.plugin.PluginLoader;
 
@@ -45,7 +46,8 @@ public class ServerManager {
      */
     public ServerManager(String bindingIP, int port) {
         logger = Logger.getLogger("PraServer");
-        commandManager = new CommandManager();
+        ExceptionHandler.setLogger(logger);
+        commandManager = new CommandManager(logger, eventManager);
         eventManager = new EventManager();
         server = new PraServer(bindingIP, port);
     }
@@ -60,7 +62,7 @@ public class ServerManager {
     public ServerManager(String bindingIP, int port, boolean useCommandSystem, boolean usePluginSystem) {
         logger = Logger.getLogger("PraServer");
         if (useCommandSystem)
-            commandManager = new CommandManager();
+            commandManager = new CommandManager(logger, eventManager);
         eventManager = new EventManager();
         if (usePluginSystem)
             pluginLoader = new PluginLoader();

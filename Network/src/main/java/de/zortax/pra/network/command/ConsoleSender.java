@@ -1,6 +1,4 @@
-package de.zortax.pra.server.command;//  Created by Leo on 28.04.2017.
-
-import de.zortax.pra.server.ServerManager;
+package de.zortax.pra.network.command;//  Created by Leo on 28.04.2017.
 
 import java.util.logging.Level;
 
@@ -30,13 +28,13 @@ public class ConsoleSender implements CommandSender {
 
     @Override
     public void sendMessage(String message) {
-        if (ServerManager.getLogger() != null)
-            ServerManager.getLogger().info(message);
+        if (CommandManager.getLogger() != null)
+            CommandManager.getLogger().info(message);
     }
 
     @Override
     public void sendMessage(Level level, String message) {
-        if (ServerManager.getLogger() != null)
-            ServerManager.getLogger().log(level, message);
+        if (CommandManager.getLogger() != null)
+            CommandManager.getLogger().log(level, message);
     }
 }

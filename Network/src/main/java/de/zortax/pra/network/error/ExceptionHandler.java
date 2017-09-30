@@ -22,6 +22,7 @@ package de.zortax.pra.network.error;//  Created by Leonard on 03.03.2017.
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,22 +30,27 @@ public class ExceptionHandler {
 
     // TODO
 
-    private static HashMap<Date, Exception> exceptions = new HashMap<>();
+    private static ConcurrentHashMap<Date, Exception> exceptions = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, Integer> typeStats = new ConcurrentHashMap<>();
     private static Logger logger;
-
-    private static final Object lock = new Object();
-
 
     public static void setLogger(Logger logger) {
         ExceptionHandler.logger = logger;
     }
 
     public static void addException(Exception e) {
-        synchronized (lock) {
-            exceptions.put(new Date(), e);
-            if (logger != null)
-                logger.log(Level.SEVERE, e.getMessage(), e);
-        }
+        exceptions.put(new Date(), e);
+        typeStats.put(e.getClass().getName(), typeStats.getOrDefault(e.getClass().getName(), 0) + 1);
+        if (logger != null)
+            logger.log(Level.SEVERE, e.getMessage(), e);
+    }
+
+    public static ConcurrentHashMap<Date, Exception> getExceptions() {
+        return exceptions;
+    }
+
+    public static int getExceptionCount(String className) {
+        return typeStats.getOrDefault(className, 0);
     }
 
 }

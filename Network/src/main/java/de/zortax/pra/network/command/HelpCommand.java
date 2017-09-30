@@ -18,19 +18,15 @@
 
  */
 
-package de.zortax.pra.server.command;//  Created by Leonard on 03.03.2017.
-
-import de.zortax.pra.server.ServerManager;
-
-import java.util.logging.Level;
+package de.zortax.pra.network.command;//  Created by Leonard on 03.03.2017.
 
 public class HelpCommand {
 
-    @PraCommand(name = "help", usage = "help [command]", description = "Shows help")
+    @PraCommand(name = "help", aliases = {"?", "wtf"}, usage = "help [command]", permission = "cmd.help", description = "Shows help")
     public static void onCommand(CommandSender sender, String[] args) {
         if (args == null || args.length == 0) {
 
-            ServerManager.commandManager.getCommands().values().forEach(m -> {
+            CommandManager.instance.getCommands().values().stream().filter(m -> sender.hasPermission(m.getAnnotation(PraCommand.class).permission())).forEach(m -> {
 
                 PraCommand annotation = m.getAnnotation(PraCommand.class);
 
@@ -41,9 +37,9 @@ public class HelpCommand {
 
             });
 
-        } else if (ServerManager.commandManager.getCommands().containsKey(args[0])) {
+        } else if (CommandManager.instance.getCommands().containsKey(args[0])) {
 
-            PraCommand annotation = ServerManager.commandManager.getCommands().get(args[0]).getAnnotation(PraCommand.class);
+            PraCommand annotation = CommandManager.instance.getCommands().get(args[0]).getAnnotation(PraCommand.class);
 
             sender.sendMessage(" ");
             sender.sendMessage(annotation.name() + " | " + annotation.usage());

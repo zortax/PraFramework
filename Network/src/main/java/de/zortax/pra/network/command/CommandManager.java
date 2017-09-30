@@ -18,15 +18,17 @@
 
  */
 
-package de.zortax.pra.server.command;//  Created by Leonard on 03.03.2017.
+package de.zortax.pra.network.command;//  Created by Leonard on 03.03.2017.
 
 import de.zortax.pra.network.error.ExceptionHandler;
-import de.zortax.pra.server.ServerManager;
+import de.zortax.pra.network.event.EventManager;
+import de.zortax.pra.network.event.CommandExecutedEvent;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CommandManager {
 
@@ -35,23 +37,32 @@ public class CommandManager {
     private InputThread inputThread;
     private Thread inputThreadObject;
 
+    private Logger logger;
+    private EventManager eventManager;
+
+    public static CommandManager instance;
+
     /**
      * Creates a new command manager
      */
-    public CommandManager() {
+    public CommandManager(Logger logger, EventManager eventManager) {
 
-        if (ServerManager.commandManager != null)
-            throw new IllegalStateException("There is already a CommandManager instance running!");
-        else
-            ServerManager.commandManager = this;
+        if (instance != null)
+            throw new IllegalStateException("There is already a command manager instance running!");
 
-        ServerManager.logger.log(Level.INFO, "Initializing command manager...");
+        instance = this;
+
+        this.logger = logger;
+        this.eventManager = eventManager;
+
+        logger.log(Level.INFO, "Initializing command manager...");
         scanner = new Scanner(System.in);
         commands = new HashMap<>();
         inputThread = new InputThread();
         inputThreadObject = new Thread(inputThread);
 
         addCommand(HelpCommand.class);
+        addCommand(ExceptionCommand.class);
     }
 
     /**
@@ -72,7 +83,7 @@ public class CommandManager {
         Method[] methods = command.getDeclaredMethods();
         for (Method method : methods) {
             if (method.isAnnotationPresent(PraCommand.class)) {
-                commands.put(method.getAnnotation(PraCommand.class).name(), method);
+                commands.put(method.getAnnotation(PraCommand.class).name().toLowerCase(), method);
             }
         }
     }
@@ -102,9 +113,9 @@ public class CommandManager {
         try {
             String[] cmd = command.split(" ");
             if (cmd.length > 0) {
-                if (commands.containsKey(cmd[0])) {
-                    ServerManager.logger.log(Level.INFO, sender.getName() + " issued server command " + cmd[0]);
-                    Method cmdMethod = commands.get(cmd[0]);
+                Method cmdMethod = getCommand(cmd[0]);
+                if (cmdMethod != null) {
+                    logger.log(Level.INFO, sender.getName() + " issued server command " + cmd[0]);
                     if (cmdMethod.getParameterCount() == 2 && cmdMethod.getParameterTypes()[0].equals(CommandSender.class) && cmdMethod.getParameterTypes()[1].equals(String[].class)) {
                         String[] args = new String[cmd.length - 1];
                         System.arraycopy(cmd, 1, args, 0, args.length);
@@ -120,14 +131,24 @@ public class CommandManager {
                                 sender.sendMessage(Level.WARNING, "Usage: " + annotation.usage());
                                 return;
                             }
-                            commands.get(cmd[0]).invoke(null, sender, args);
+                            CommandExecutedEvent event = new CommandExecutedEvent(cmd, commands.get(cmd[0]), annotation);
+                            eventManager.callEvent(event);
+                            if (!event.isCancelled())
+                                commands.get(cmd[0]).invoke(null, sender, args);
                         } else {
                             sender.sendMessage(Level.WARNING, "You do not have permissions to perform this command!");
                         }
-                    } else if (cmdMethod.getParameterCount() == 1)
-                        commands.get(cmd[0]).invoke(null, sender);
-                    else if (cmdMethod.getParameterCount() == 0)
-                        commands.get(cmd[0]).invoke(null);
+                    } else if (cmdMethod.getParameterCount() == 1) {
+                        CommandExecutedEvent event = new CommandExecutedEvent(cmd, commands.get(cmd[0]), cmdMethod.getAnnotation(PraCommand.class));
+                        eventManager.callEvent(event);
+                        if (!event.isCancelled())
+                            commands.get(cmd[0]).invoke(null, sender);
+                    } else if (cmdMethod.getParameterCount() == 0) {
+                        CommandExecutedEvent event = new CommandExecutedEvent(cmd, commands.get(cmd[0]), cmdMethod.getAnnotation(PraCommand.class));
+                        eventManager.callEvent(event);
+                        if (!event.isCancelled())
+                            commands.get(cmd[0]).invoke(null);
+                    }
                 } else {
                     sender.sendMessage(Level.WARNING, "Command \"" + cmd[0] + "\" not found!");
                 }
@@ -137,11 +158,33 @@ public class CommandManager {
         }
     }
 
+    private Method getCommand(String name) {
+        if (commands.containsKey(name.toLowerCase()))
+            return commands.get(name.toLowerCase());
+        else {
+            for (Method m : commands.values()) {
+                for (String alias : m.getAnnotation(PraCommand.class).aliases()) {
+                    if (name.equalsIgnoreCase(alias))
+                        return m;
+                }
+            }
+            return null;
+        }
+    }
+
+    public static Logger getLogger() {
+        return instance.logger;
+    }
+
+    public static EventManager getEventManager() {
+        return instance.eventManager;
+    }
+
     private class InputThread implements Runnable {
 
         @Override
         public void run() {
-            ServerManager.logger.log(Level.INFO, "Input listener started...");
+            logger.log(Level.INFO, "Input listener started...");
             try {
                 while (true)
                     execute(ConsoleSender.instance, scanner.nextLine());
