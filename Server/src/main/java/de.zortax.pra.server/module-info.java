@@ -1,6 +1,6 @@
 // Created by leo on 26.09.17
-module PraServer {
-    requires PraNetwork;
+module de.zortax.pra.server {
+    requires de.zortax.pra.network;
     requires gson;
     requires java.logging;
     exports de.zortax.pra.server;
