@@ -30,12 +30,22 @@ public class StringSerializer implements FieldSerializer<String> {
 
     @Override
     public byte[] toBytes(Field f, Object instance) throws IllegalAccessException {
+
+        //Bytes of the field as bytes
         byte[] val = ((String) f.get(instance)).getBytes();
+        //final byte array, the five bytes are used for the additional info like type, length of name and content
         byte[] bytes = new byte[val.length + f.getName().getBytes().length + 5];
+
         bytes[0] = TypeCode.STRING.getCode();
+
+        //Transforms the length of the name into a char (which is unsigned)
         System.arraycopy(CharSerializer.toByteArray((char) f.getName().getBytes().length), 0, bytes, 1, 2);
+
         System.arraycopy(f.getName().getBytes(), 0, bytes, 3, f.getName().getBytes().length);
+
+        //Same as in line 42
         System.arraycopy(CharSerializer.toByteArray((char) val.length), 0, bytes, f.getName().getBytes().length + 3, 2);
+
         System.arraycopy(val, 0, bytes, f.getName().getBytes().length + 5, val.length);
         return bytes;
     }

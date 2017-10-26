@@ -29,6 +29,11 @@ import java.util.HashMap;
 
 public class Util {
 
+    /**
+     *
+     * @param bytes representing one serialized field
+     * @return the name of the field
+     */
     public static String getFieldName(byte[] bytes) {
         byte[] nameSize = new byte[2];
         nameSize[0] = bytes[1];
@@ -39,6 +44,13 @@ public class Util {
         return new String(name);
     }
 
+    /**
+     * Helper class for some primitive types like short or int
+     * @param typeCode
+     * @param name
+     * @param value
+     * @return
+     */
     public static byte[] toBytes(TypeCode typeCode, String name, byte[] value) {
         byte[] nameBytes = name.getBytes();
         byte[] bytes = new byte[nameBytes.length + value.length + 3];
@@ -49,6 +61,13 @@ public class Util {
         return bytes;
     }
 
+    /**
+     * Helper class for some primitive types like short or int
+     * @param allData
+     * @param index
+     * @param valueSize
+     * @return
+     */
     public static byte[] getBlock(byte[] allData, int index, int valueSize) {
         byte[] nameSizeBytes = new byte[2];
         nameSizeBytes[0] = allData[index + 1];
@@ -59,6 +78,12 @@ public class Util {
         return bytes;
     }
 
+    /**
+     * Helper class for some primitive types like short or int
+     * @param bytes
+     * @param valueSize
+     * @return
+     */
     public static byte[] getValueBytes(byte[] bytes, int valueSize) {
         byte[] value = new byte[valueSize];
         System.arraycopy(bytes, bytes.length - valueSize, value, 0, valueSize);

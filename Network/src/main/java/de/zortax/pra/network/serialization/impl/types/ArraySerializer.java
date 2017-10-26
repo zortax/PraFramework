@@ -111,19 +111,24 @@ public class ArraySerializer implements FieldSerializer<ArrayContainer> {
         if (object == null)
             return new byte[0];
         if (object.getClass().isArray()) {
+            //If the array is an Object[] (which means that it can contain both int[], String and SomeComplexType)
             if (object instanceof Object[]) {
                 ArrayList<Byte> bytes = new ArrayList<>();
                 Object[] array = (Object[]) object;
                 for (int i = 0; i < array.length; i++) {
-                    Object c = array[i];
+                    Object c = array[i]; //The current object
                     if (c != null) {
+
+                        //The index as an unsigned short
                         byte[] index = CharSerializer.toByteArray((char) i);
                         bytes.add(index[0]);
                         bytes.add(index[1]);
-                        byte[] elementBytes = toByteArray(c, serializer);
+
+                        byte[] elementBytes = toByteArray(c, serializer); //Transforms the current Object to an byte Array
                         if (c.getClass().isArray()
                                 || TypeCode.fromClass(c.getClass()).equals(TypeCode.COMPLEX)
                                 || TypeCode.fromClass(c.getClass()).equals(TypeCode.STRING)) {
+                            //Adds the size of the content as an unsigned short
                             byte[] elementSize = CharSerializer.toByteArray((char) elementBytes.length);
                             bytes.add(elementSize[0]);
                             bytes.add(elementSize[1]);
@@ -132,6 +137,7 @@ public class ArraySerializer implements FieldSerializer<ArrayContainer> {
                             bytes.add(b);
                     }
                 }
+                //Converts the arrayList<Byte> into an array and returns it
                 byte[] allBytes = new byte[bytes.size()];
                 for (int i = 0; i < allBytes.length; i++)
                     allBytes[i] = bytes.get(i);

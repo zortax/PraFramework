@@ -1,16 +1,23 @@
 package de.zortax.pra.network.serialization.impl.types;
 
 import de.zortax.pra.network.serialization.impl.PraSerializer;
+import de.zortax.pra.network.serialization.impl.Util;
 import org.junit.Assert;
 import org.junit.Test;
 
 // Created by leo on 16.07.17
 public class ArraySerializerTest {
 
+    private final PraSerializer serializer = new PraSerializer();
+
+    @Test
+    public void arrayLength(){
+        int[][][] testArray = new int[1][1][1];
+        int dimensions = Util.getArrayDimensions(testArray);
+        Assert.assertEquals(dimensions, 3);
+    }
     @Test
     public void toByteArray() throws Exception {
-
-        PraSerializer serializer = new PraSerializer();
 
         int[] intArray = new int[]{1, 2, 3, 4, 42, 7};
         byte[] intBytes = ArraySerializer.toByteArray(intArray, serializer);
@@ -22,7 +29,6 @@ public class ArraySerializerTest {
 
     @Test
     public void fromByteArray() throws Exception {
-        PraSerializer serializer = new PraSerializer();
 
         int[] intArray = new int[]{1, 2, 3, 4, 42, 7};
         byte[] intBytes = ArraySerializer.toByteArray(intArray, serializer);
