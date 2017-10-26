@@ -35,4 +35,12 @@ public interface CommandSender {
         sendMessage(message);
     }
 
+    /**
+     * Should return the language code for the current command sender
+     * @return language code
+     */
+    default String getLanguage() {
+        return "en";
+    }
+
 }
