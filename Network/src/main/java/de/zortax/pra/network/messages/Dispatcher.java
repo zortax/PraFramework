@@ -4,6 +4,7 @@ import de.zortax.pra.network.command.CommandSender;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Dispatcher {
@@ -14,12 +15,13 @@ public class Dispatcher {
     private Logger logger;
 
     public Dispatcher(MessageAdapter messageAdapter) {
-        this.messageAdapter = messageAdapter;
-        this.constants = new ConcurrentHashMap<>();
+        this(messageAdapter, null);
     }
 
     public Dispatcher(MessageAdapter messageAdapter, Logger logger) {
-        this(messageAdapter);
+        this.messageAdapter = messageAdapter;
+        this.constants = new ConcurrentHashMap<>();
+        this.messageAdapter.initialize(logger);
         this.logger = logger;
     }
 
@@ -35,6 +37,11 @@ public class Dispatcher {
 
     public String getMessage(String lang, String key, Object... vals) {
         String msg = messageAdapter.getMessage(key, lang);
+        if (msg == null) {
+            if (logger != null)
+                logger.log(Level.WARNING, "The message adapter returned null for key \"" + key + "\" on language code \"" + lang + "\"!");
+            return "null";
+        }
         for (Object val : vals) {
             if (int.class.isInstance(val))
                 msg = msg.replaceFirst("%int", String.valueOf((int) val));
