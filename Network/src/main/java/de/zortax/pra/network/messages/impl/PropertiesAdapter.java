@@ -42,23 +42,25 @@ public class PropertiesAdapter implements MessageAdapter {
         this.logger = logger;
         this.log(Level.INFO, "Loading default messages...");
         try {
-            this.defaultMessages.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("/resources/i18n/messages.properties"));
-        } catch (IOException e) {
+            this.defaultMessages.load(this.getClass().getResourceAsStream("/resources/i18n/messages.properties"));
+        } catch (Exception e) {
             ExceptionHandler.addException(e);
         }
     }
 
     @Override
     public String getMessage(String key, String lang) {
-        if (languages.containsKey(lang))
+        if (lang == null || lang.equalsIgnoreCase("null") || lang.equalsIgnoreCase("default"))
+            return defaultMessages.getProperty(key);
+        else if (languages.containsKey(lang))
             return languages.get(lang).getProperty(key);
         else {
             log(Level.INFO, "Trying to load language \"" + lang + "\"...");
             Properties langProps = new Properties(defaultMessages);
             try {
-                langProps.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("/resources/i18n/" + lang + ".properties"));
-            } catch (IOException e) {
-                ExceptionHandler.addException(e);
+                langProps.load(this.getClass().getResourceAsStream("/resources/i18n/" + lang + ".properties"));
+            } catch (Exception e) {
+                log(Level.WARNING, "The language \"" + lang + "\" wasn't found!");
             }
             languages.put(lang, langProps);
             return langProps.getProperty(key);
