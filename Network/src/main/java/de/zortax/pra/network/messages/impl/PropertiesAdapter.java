@@ -23,7 +23,6 @@ package de.zortax.pra.network.messages.impl;// Created by leo on 27.10.17
 import de.zortax.pra.network.error.ExceptionHandler;
 import de.zortax.pra.network.messages.MessageAdapter;
 
-import java.io.IOException;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;

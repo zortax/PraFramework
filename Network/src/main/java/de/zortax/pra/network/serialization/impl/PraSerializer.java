@@ -170,21 +170,21 @@ public class PraSerializer implements Serializer {
             throws IllegalAccessException, InstantiationException, NoSuchFieldException, ClassNotFoundException, InvocationTargetException {
 
         if (type.equals(byte.class) || type.equals(Byte.class))
-            return (T) new Byte(bytes[0]);
+            return (T) Byte.valueOf(bytes[0]);
         else if (type.equals(boolean.class) || type.equals(Boolean.class))
             return (T) (TypeCode.fromCode(bytes[0]).equals(TypeCode.BOOLEAN_TRUE) ? Boolean.TRUE : Boolean.FALSE);
         else if (type.equals(char.class) || type.equals(Character.class))
-            return (T) new Character(CharSerializer.fromByteArray(bytes));
+            return (T) Character.valueOf(CharSerializer.fromByteArray(bytes));
         else if (type.equals(short.class) || type.equals(Short.class))
-            return (T) new Short(ShortSerializer.fromByteArray(bytes));
+            return (T) Short.valueOf(ShortSerializer.fromByteArray(bytes));
         else if (type.equals(int.class) || type.equals(Integer.class))
-            return (T) new Integer(IntegerSerializer.fromByteArray(bytes));
+            return (T) Integer.valueOf(IntegerSerializer.fromByteArray(bytes));
         else if (type.equals(long.class) || type.equals(Long.class))
-            return (T) new Long(LongSerializer.fromByteArray(bytes));
+            return (T) Long.valueOf(LongSerializer.fromByteArray(bytes));
         else if (type.equals(float.class) || type.equals(Float.class))
-            return (T) new Float(FloatSerializer.fromByteArray(bytes));
+            return (T) Float.valueOf(FloatSerializer.fromByteArray(bytes));
         else if (type.equals(double.class) || type.equals(Double.class))
-            return (T) new Double(DoubleSerializer.fromByteArray(bytes));
+            return (T) Double.valueOf(DoubleSerializer.fromByteArray(bytes));
         else if (type.equals(String.class))
             return (T) new String(bytes);
         else if (type.isArray())
