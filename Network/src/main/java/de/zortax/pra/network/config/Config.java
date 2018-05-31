@@ -32,15 +32,20 @@ import java.util.Scanner;
 public abstract class Config {
 
     private transient String name;
+    private transient String fullPath;
     private transient static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     final void setName(String name) {
         this.name = name;
     }
 
+    final void setFullPath(String path) {
+        this.fullPath = path;
+    }
+
     public final boolean save() {
         try {
-            PrintWriter pw = new PrintWriter(name, "UTF-8");
+            PrintWriter pw = new PrintWriter(fullPath, "UTF-8");
             pw.println(this.toString());
             pw.flush();
             pw.close();
@@ -68,6 +73,7 @@ public abstract class Config {
             } else {
                 T cfg = config.newInstance();
                 cfg.setName(file.getName());
+                cfg.setFullPath(file.getAbsolutePath());
                 if (file.createNewFile()) {
                     cfg.save();
                 }
